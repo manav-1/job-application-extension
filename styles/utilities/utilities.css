@@ -1102,3 +1102,186 @@
 .disabled\\:pointer-events-none:disabled {
   pointer-events: none;
 }
+
+/* Width Utilities */
+.w-full {
+  width: 100%;
+}
+
+.w-auto {
+  width: auto;
+}
+
+.w-fit {
+  width: fit-content;
+}
+
+.w-min {
+  width: min-content;
+}
+
+.w-max {
+  width: max-content;
+}
+
+/* Height Utilities */
+.h-full {
+  height: 100%;
+}
+
+.h-auto {
+  height: auto;
+}
+
+.h-fit {
+  height: fit-content;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+/* Min/Max Width */
+.min-w-0 {
+  min-width: 0;
+}
+
+.min-w-full {
+  min-width: 100%;
+}
+
+.max-w-none {
+  max-width: none;
+}
+
+.max-w-full {
+  max-width: 100%;
+}
+
+/* Min/Max Height */
+.min-h-0 {
+  min-height: 0;
+}
+
+.min-h-full {
+  min-height: 100%;
+}
+
+.max-h-full {
+  max-height: 100%;
+}
+
+/* Text Utilities */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-justify {
+  text-align: justify;
+}
+
+/* Text Wrapping */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-wrap {
+  text-wrap: wrap;
+}
+
+.text-nowrap {
+  white-space: nowrap;
+}
+
+/* Border Radius Utilities */
+.rounded-none {
+  border-radius: var(--radius-none);
+}
+
+.rounded-sm {
+  border-radius: var(--radius-sm);
+}
+
+.rounded {
+  border-radius: var(--radius-base);
+}
+
+.rounded-md {
+  border-radius: var(--radius-md);
+}
+
+.rounded-lg {
+  border-radius: var(--radius-lg);
+}
+
+.rounded-xl {
+  border-radius: var(--radius-xl);
+}
+
+.rounded-2xl {
+  border-radius: var(--radius-2xl);
+}
+
+.rounded-full {
+  border-radius: var(--radius-full);
+}
+
+/* Shadow Utilities */
+.shadow-none {
+  box-shadow: none;
+}
+
+.shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+.shadow-xl {
+  box-shadow: var(--shadow-xl);
+}
+
+.shadow-2xl {
+  box-shadow: var(--shadow-2xl);
+}
+
+/* Opacity Utilities */
+.opacity-0 {
+  opacity: 0;
+}
+
+.opacity-25 {
+  opacity: 0.25;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.opacity-75 {
+  opacity: 0.75;
+}
+
+.opacity-100 {
+  opacity: 1;
+}

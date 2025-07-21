@@ -1,0 +1,994 @@
+/* ==========================================================================
+   POPUP OPTIMIZATIONS
+   Professional Chrome Extension Popup Styling
+   ========================================================================== */
+
+/* Ensure popup body has proper constraints - Wider and Professional */
+body {
+  margin: 0;
+  padding: 0;
+  width: 650px;
+  max-width: 650px;
+  min-height: 520px;
+  max-height: 580px;
+  overflow: hidden;
+  background: var(--color-background-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    system-ui, sans-serif;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+/* Extension layout optimizations for popup context */
+.extension-layout {
+  position: relative;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  width: 650px;
+  max-width: 650px;
+  height: 520px;
+  max-height: 580px;
+  display: flex;
+  background: var(--color-background-primary);
+  border-radius: 0;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+/* Professional sidebar styling */
+.extension-sidebar {
+  width: 100px;
+  min-width: 100px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-right: none;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  position: relative;
+  transition: width 0.3s ease, min-width 0.3s ease;
+}
+
+.extension-content {
+  flex: 1;
+  background: var(--color-background-primary);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-6) var(--space-5);
+  height: 100%;
+  color: #2d3748;
+  transition: padding 0.3s ease;
+}
+
+/* Ensure proper viewport and scrolling behavior */
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Professional custom scrollbar */
+.extension-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(102, 126, 234, 0.3) transparent;
+}
+
+.extension-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.extension-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.extension-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.3),
+    rgba(118, 75, 162, 0.3)
+  );
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.extension-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.6),
+    rgba(118, 75, 162, 0.6)
+  );
+}
+
+/* Professional tab content styling */
+.tab-content {
+  display: none;
+  animation: fadeIn 0.2s ease-in-out;
+  color: #2d3748;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Professional form styling */
+.extension-layout .form-group {
+  margin-bottom: var(--space-5);
+}
+
+.extension-layout .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.extension-layout .form-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: var(--space-2);
+  letter-spacing: 0.025em;
+}
+
+.extension-layout .form-input,
+.extension-layout .form-textarea,
+.extension-layout .form-select {
+  font-size: var(--font-size-sm);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.95);
+  color: #2d3748;
+}
+
+.extension-layout .form-input::placeholder,
+.extension-layout .form-textarea::placeholder {
+  color: #a0aec0;
+}
+
+.extension-layout .form-input:focus,
+.extension-layout .form-textarea:focus,
+.extension-layout .form-select:focus {
+  border-color: rgba(102, 126, 234, 0.6);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  outline: none;
+}
+
+/* Professional grid layout */
+.extension-layout .grid {
+  gap: var(--space-4);
+}
+
+.extension-layout .grid.grid-cols-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.extension-layout .grid.grid-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Professional action buttons - Fixed positioning */
+.extension-layout .fixed.bottom-0.right-0 {
+  position: fixed;
+  bottom: var(--space-5);
+  right: var(--space-5);
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.extension-layout .fixed .btn {
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  margin: 0 var(--space-2);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  color: #2d3748 !important;
+}
+
+.extension-layout .fixed .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff !important;
+  border-color: transparent;
+}
+
+.extension-layout .fixed .btn-secondary {
+  background: rgba(255, 255, 255, 0.9);
+  color: #2d3748 !important;
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.extension-layout .fixed .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.extension-layout .fixed .btn-primary:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  color: #ffffff !important;
+}
+
+.extension-layout .fixed .btn-secondary:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #2d3748 !important;
+}
+
+/* Ensure content doesn't overlap with fixed buttons */
+.extension-layout .tab-content {
+  padding-bottom: var(--space-20);
+  margin-bottom: 0;
+}
+
+/* Professional card styling */
+.extension-layout .card {
+  margin-bottom: var(--space-5);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease, margin 0.3s ease;
+}
+
+.extension-layout .card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-color: rgba(102, 126, 234, 0.2);
+}
+
+.extension-layout .card:last-child {
+  margin-bottom: var(--space-8);
+}
+
+.extension-layout .card-content {
+  padding: var(--space-5);
+}
+
+.extension-layout .card-header {
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.extension-layout .card-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+}
+
+.extension-layout .card-description {
+  font-size: var(--font-size-sm);
+  color: #4a5568;
+  margin-top: var(--space-2);
+  line-height: 1.5;
+}
+
+/* Professional textarea styling */
+.extension-layout .form-textarea {
+  min-height: 90px;
+  max-height: 140px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+/* Professional button spacing */
+.extension-layout .flex.gap-3 {
+  gap: var(--space-3);
+}
+
+.extension-layout .flex.gap-4 {
+  gap: var(--space-4);
+}
+
+.extension-layout .flex.gap-6 {
+  gap: var(--space-6);
+}
+
+/* Professional navigation styling */
+.nav-header {
+  padding: var(--space-4) 0;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-brand {
+  font-size: 24px;
+  color: #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: var(--space-2) 0;
+}
+
+.nav-item {
+  color: rgba(255, 255, 255, 0.9) !important;
+  border: none;
+  background: transparent;
+  transition: all 0.2s ease;
+  margin: var(--space-1) 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  padding: var(--space-2) var(--space-1);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.nav-item.active {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-item.active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 1.5px 0 0 1.5px;
+}
+
+/* Navigation item text and icon colors */
+.nav-item-text {
+  color: inherit !important;
+  font-size: 12px !important;
+  margin-top: var(--space-1);
+  text-align: center;
+  line-height: 1.2;
+  font-weight: 500;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  max-width: 82px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: none !important;
+}
+
+.nav-item:hover .nav-item-text,
+.nav-item.active .nav-item-text,
+.nav-item-text:hover {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  color: inherit !important;
+}
+
+.nav-item-icon {
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-bottom: 3px;
+}
+
+.nav-item-icon svg {
+  fill: currentColor;
+  width: 16px;
+  height: 16px;
+}
+
+/* Disable tooltips in popup context */
+.extension-layout .tooltip:hover::after,
+.extension-layout .tooltip:hover::before {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Content area text defaults */
+.extension-content {
+  color: #2d3748;
+}
+
+/* Tab content text colors */
+.tab-content {
+  color: #2d3748;
+}
+
+.tab-content * {
+  color: inherit;
+}
+
+/* Override any white text in content area */
+.extension-content .text-white {
+  color: #2d3748 !important;
+}
+
+.extension-layout .text-white {
+  color: #2d3748 !important;
+}
+
+/* Prevent text selection on UI elements */
+.nav-item,
+.btn,
+.card-header {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Professional focus management */
+.extension-layout :focus-visible {
+  outline: 2px solid rgba(102, 126, 234, 0.6);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Remove all responsive adjustments - Fixed popup size */
+/* Popup is now consistently 650x520px for professional appearance */
+
+/* Professional button container styling */
+.extension-layout .flex.gap-3.fixed {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+/* Additional professional enhancements */
+.extension-layout h1,
+.extension-layout h2,
+.extension-layout h3 {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.extension-layout .text-sm {
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+/* Professional button text colors */
+.extension-layout .btn {
+  color: #2d3748 !important;
+}
+
+.extension-layout .btn-primary {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+}
+
+.extension-layout .btn-primary:hover {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+.extension-layout .btn-secondary {
+  color: #2d3748 !important;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.extension-layout .btn-secondary:hover {
+  color: #2d3748 !important;
+  background: rgba(255, 255, 255, 1);
+}
+
+.extension-layout .btn-ghost {
+  color: #4a5568 !important;
+  background: transparent;
+  border-color: transparent;
+}
+
+.extension-layout .btn-ghost:hover {
+  color: #2d3748 !important;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Animation for loading states */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* AI Status Indicator */
+.ai-status {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.ai-status.connected {
+  background: rgba(16, 185, 129, 0.1);
+  color: #065f46;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.ai-status.disconnected {
+  background: rgba(239, 68, 68, 0.1);
+  color: #991b1b;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Question display styling */
+.space-y-3 > * + * {
+  margin-top: var(--space-3);
+}
+
+.space-y-4 > * + * {
+  margin-top: var(--space-4);
+}
+
+/* Additional utility classes */
+.text-red-600 {
+  color: #dc2626;
+}
+
+.bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+.border-l-4 {
+  border-left-width: 4px;
+}
+
+.border-blue-500 {
+  border-left-color: #3b82f6;
+}
+
+.text-gray-900 {
+  color: #111827;
+}
+
+.text-gray-600 {
+  color: #4b5563;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.mb-3 {
+  margin-bottom: var(--space-3);
+}
+
+.mb-6 {
+  margin-bottom: var(--space-6);
+}
+
+.mt-2 {
+  margin-top: var(--space-2);
+}
+
+.mt-4 {
+  margin-top: var(--space-4);
+}
+
+.p-4 {
+  padding: var(--space-4);
+}
+
+.rounded-lg {
+  border-radius: var(--radius-lg);
+}
+
+/* Professional text colors for content */
+.extension-layout p,
+.extension-layout span,
+.extension-layout div {
+  color: #2d3748;
+}
+
+.extension-layout .text-secondary {
+  color: #4a5568;
+}
+
+.extension-layout .text-muted {
+  color: #718096;
+}
+
+/* Professional loading states */
+.extension-layout .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Professional success/error states */
+.extension-layout .form-input.error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.extension-layout .form-input.success {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Force navigation text visibility in popup - Override all other rules */
+.extension-layout .nav-item-text,
+.extension-sidebar .nav-item-text,
+.nav-sidebar .nav-item-text {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  font-size: 12px !important;
+  color: inherit !important;
+  transition: none !important;
+}
+
+/* Prevent any hover animations on text */
+.extension-layout .nav-item:hover .nav-item-text,
+.extension-layout .nav-item.active .nav-item-text,
+.extension-sidebar .nav-item:hover .nav-item-text,
+.extension-sidebar .nav-item.active .nav-item-text {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  transform: none !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Compact Mode Support for Popup - Comprehensive */
+body.compact-mode .extension-sidebar {
+  width: 60px;
+  min-width: 60px;
+}
+
+body.compact-mode .extension-sidebar.collapsed .nav-item-text {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+body.compact-mode .extension-sidebar.collapsed .nav-item {
+  justify-content: center !important;
+  padding: var(--space-2) !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 56px !important;
+}
+
+/* Compact mode - reduce overall content padding */
+body.compact-mode .extension-content {
+  padding: var(--space-4) var(--space-3);
+}
+
+/* Compact mode - reduce card spacing and padding */
+body.compact-mode .extension-layout .card {
+  margin-bottom: var(--space-3);
+}
+
+body.compact-mode .extension-layout .card-content {
+  padding: var(--space-3);
+}
+
+body.compact-mode .extension-layout .card-header {
+  padding: var(--space-3) var(--space-3) var(--space-2);
+}
+
+/* Compact mode - reduce form element spacing */
+body.compact-mode .extension-layout .form-group {
+  margin-bottom: var(--space-3);
+}
+
+body.compact-mode .extension-layout .form-input,
+body.compact-mode .extension-layout .form-textarea,
+body.compact-mode .extension-layout .form-select {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-xs);
+}
+
+body.compact-mode .extension-layout .form-label {
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-xs);
+}
+
+/* Compact mode - reduce grid gaps */
+body.compact-mode .extension-layout .grid {
+  gap: var(--space-2);
+}
+
+/* Compact mode - reduce button spacing and size */
+body.compact-mode .extension-layout .btn {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-xs);
+}
+
+body.compact-mode .extension-layout .flex.gap-3 {
+  gap: var(--space-2);
+}
+
+body.compact-mode .extension-layout .flex.gap-4 {
+  gap: var(--space-2);
+}
+
+body.compact-mode .extension-layout .flex.gap-6 {
+  gap: var(--space-3);
+}
+
+/* Compact mode - reduce navigation spacing */
+body.compact-mode .nav-header {
+  padding: var(--space-2) 0;
+}
+
+body.compact-mode .nav-brand {
+  font-size: 18px;
+}
+
+body.compact-mode .nav-menu {
+  padding: var(--space-1) 0;
+}
+
+body.compact-mode .nav-item {
+  margin: 2px 0;
+  padding: var(--space-1);
+}
+
+/* Compact mode - reduce tab content padding */
+body.compact-mode .extension-layout .tab-content {
+  padding-bottom: var(--space-12);
+}
+
+/* Compact mode - reduce fixed buttons container */
+body.compact-mode .extension-layout .fixed.bottom-0.right-0 {
+  padding: var(--space-2);
+  bottom: var(--space-3);
+  right: var(--space-3);
+}
+
+body.compact-mode .extension-layout .fixed .btn {
+  margin: 0 var(--space-1);
+  padding: var(--space-2) var(--space-3);
+}
+
+/* Compact mode - reduce textarea heights */
+body.compact-mode .extension-layout .form-textarea {
+  min-height: 60px;
+  max-height: 100px;
+}
+
+/* Compact mode - reduce card title and description spacing */
+body.compact-mode .extension-layout .card-title {
+  font-size: var(--font-size-md);
+}
+
+body.compact-mode .extension-layout .card-description {
+  font-size: var(--font-size-xs);
+  margin-top: var(--space-1);
+}
+
+/* Compact mode - reduce space utility classes */
+body.compact-mode .space-y-3 > * + * {
+  margin-top: var(--space-2);
+}
+
+body.compact-mode .space-y-4 > * + * {
+  margin-top: var(--space-2);
+}
+
+body.compact-mode .mb-3 {
+  margin-bottom: var(--space-2);
+}
+
+body.compact-mode .mb-6 {
+  margin-bottom: var(--space-3);
+}
+
+body.compact-mode .mt-2 {
+  margin-top: var(--space-1);
+}
+
+body.compact-mode .mt-4 {
+  margin-top: var(--space-2);
+}
+
+body.compact-mode .p-4 {
+  padding: var(--space-2);
+}
+
+/* Compact mode - reduce AI status indicator padding */
+body.compact-mode .ai-status {
+  padding: var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+/* Compact mode - reduce overall popup dimensions for ultra-compact feel */
+body.compact-mode {
+  width: 580px;
+  max-width: 580px;
+  min-height: 460px;
+  max-height: 520px;
+}
+
+body.compact-mode .extension-layout {
+  width: 580px;
+  max-width: 580px;
+  height: 460px;
+  max-height: 520px;
+}
+
+/* Compact mode - adjust icon sizes in compact sidebar */
+body.compact-mode .nav-item-icon {
+  width: 16px;
+  height: 16px;
+}
+
+body.compact-mode .nav-item-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Compact mode - reduce application stats grid spacing */
+body.compact-mode .grid.grid-cols-4 {
+  gap: var(--space-2);
+}
+
+/* Compact mode - reduce stats card content padding */
+body.compact-mode .card-content.p-4.text-center {
+  padding: var(--space-2) !important;
+}
+
+body.compact-mode .card-content.p-4.text-center .text-2xl {
+  font-size: 1.25rem !important;
+}
+
+body.compact-mode .card-content.p-4.text-center .text-sm {
+  font-size: 0.75rem !important;
+}
+
+/* Compact mode - reduce form help text size */
+body.compact-mode .form-help {
+  font-size: 10px;
+  margin-top: var(--space-1);
+}
+
+/* Compact mode - reduce divider margins */
+body.compact-mode .divider {
+  margin: var(--space-2) 0;
+}
+
+/* Compact mode - reduce alert padding */
+body.compact-mode .alert {
+  padding: var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+body.compact-mode .alert svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Compact mode - reduce notification size */
+body.compact-mode .alert.fixed {
+  padding: var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+/* Compact mode - adjust button icons */
+body.compact-mode .btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Compact mode - reduce experience card spacing */
+body.compact-mode .justify-between.items-start {
+  margin-bottom: var(--space-2) !important;
+}
+
+/* Compact mode - reduce text sizing in content */
+body.compact-mode .text-lg {
+  font-size: var(--font-size-md) !important;
+}
+
+body.compact-mode .text-md {
+  font-size: var(--font-size-sm) !important;
+}
+
+body.compact-mode h3.text-lg {
+  font-size: var(--font-size-md) !important;
+  margin-bottom: var(--space-2) !important;
+}
+
+/* Compact mode - ensure minimum usability on very small elements */
+body.compact-mode .form-input:focus,
+body.compact-mode .form-textarea:focus,
+body.compact-mode .form-select:focus {
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+/* Regular mode - ensure text is always visible */
+body:not(.compact-mode) .extension-layout .nav-item-text,
+body:not(.compact-mode) .extension-sidebar .nav-item-text {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  font-size: 12px !important;
+}
+
+/* Prevent JavaScript from hiding text */
+.extension-layout [style*="opacity: 0"] .nav-item-text,
+.extension-layout [style*="width: 0"] .nav-item-text {
+  opacity: 1 !important;
+  width: auto !important;
+}
+
+/* Ultimate text protection - Nuclear option to ensure text is always visible */
+.extension-layout * [class*="nav-item-text"],
+.extension-layout * [class*="item-text"],
+.extension-layout .nav-item > span,
+.extension-layout .nav-item > .nav-item-text,
+.extension-sidebar .nav-item > span,
+.extension-sidebar .nav-item > .nav-item-text {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  font-size: 12px !important;
+  max-width: 82px !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  color: inherit !important;
+}
+
+/* Prevent any CSS animations or transitions from hiding text */
+.extension-layout .nav-item-text,
+.extension-sidebar .nav-item-text {
+  animation: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Override inline styles that might be applied by JavaScript */
+.extension-layout .nav-item-text[style],
+.extension-sidebar .nav-item-text[style] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+}
