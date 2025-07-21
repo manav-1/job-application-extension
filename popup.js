@@ -520,6 +520,7 @@ class PopupManager {
         "state",
         "zipCode",
         "linkedinUrl",
+        "githubUrl",
         "portfolioUrl",
       ];
 

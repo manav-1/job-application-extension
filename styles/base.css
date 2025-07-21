@@ -1,35 +1,35 @@
 /* Base styles and CSS variables */
 :root {
-  /* Color Palette */
-  --primary-color: #4f46e5;
-  --primary-dark: #3730a3;
-  --primary-light: #6366f1;
-  --accent-color: #f59e0b;
-  --accent-dark: #d97706;
-  --accent-light: #fbbf24;
+  /* Warm Terracotta Theme - Professional & Modern */
+  --primary-color: #4a4947; /* Dark charcoal gray */
+  --primary-dark: #3a3734; /* Darker charcoal */
+  --primary-light: #5a5754; /* Lighter charcoal */
+  --accent-color: #b17457; /* Rich terracotta/rust */
+  --accent-dark: #9a5f44; /* Darker terracotta */
+  --accent-light: #c8876a; /* Lighter terracotta */
 
-  /* Neutral Colors */
-  --white: #ffffff;
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
+  /* Neutral Colors - Warm beige palette */
+  --white: #faf7f0; /* Warm off-white */
+  --gray-50: #f5f1e8;
+  --gray-100: #efebe0;
+  --gray-200: #e8e3d6;
+  --gray-300: #d8d2c2; /* Light warm beige */
+  --gray-400: #c9c0ad;
+  --gray-500: #b8ac96;
+  --gray-600: #a6977f;
+  --gray-700: #948168;
+  --gray-800: #6d5f52;
+  --gray-900: #4a4947; /* Using theme color */
 
-  /* Status Colors */
-  --success-color: #10b981;
-  --success-light: #34d399;
-  --warning-color: #f59e0b;
-  --warning-light: #fbbf24;
-  --error-color: #ef4444;
-  --error-light: #f87171;
-  --info-color: #3b82f6;
-  --info-light: #60a5fa;
+  /* Status Colors - Adapted to warm terracotta theme */
+  --success-color: #8db17a; /* Warm green */
+  --success-light: #a3c391;
+  --warning-color: #d1a66b; /* Warm gold */
+  --warning-light: #ddb680;
+  --error-color: #c47a6b; /* Warm coral */
+  --error-light: #d49284;
+  --info-color: #393e46; /* Using theme gray-blue */
+  --info-light: #4a453d;
 
   /* Spacing */
   --space-xs: 4px;
@@ -88,9 +88,9 @@ body {
   background: linear-gradient(
     135deg,
     var(--primary-color) 0%,
-    var(--primary-dark) 100%
+    var(--primary-light) 100%
   );
-  color: var(--gray-900);
+  color: var(--white);
   line-height: 1.5;
   font-size: var(--font-size-sm);
 }

@@ -1,10 +1,10 @@
 /* Styles for the job application filler extension */
 
 .job-filler-suggestions {
-  background: #e9e3df;
-  border: 1px solid rgba(70, 92, 136, 0.2);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: var(--white);
+  border: 1px solid rgba(57, 62, 70, 0.2);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(34, 40, 49, 0.15);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
   max-width: 300px;
@@ -17,11 +17,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background: rgba(70, 92, 136, 0.1);
-  border-bottom: 1px solid rgba(70, 92, 136, 0.2);
-  border-radius: 8px 8px 0 0;
+  background: rgba(148, 137, 121, 0.1);
+  border-bottom: 1px solid rgba(148, 137, 121, 0.2);
+  border-radius: 6px 6px 0 0;
   font-weight: 600;
-  color: #000000;
+  color: var(--primary-color);
 }
 
 .job-filler-close {
@@ -29,20 +29,20 @@
   border: none;
   font-size: 16px;
   cursor: pointer;
-  color: #465c88;
+  color: var(--accent-color);
   padding: 0;
-  width: 20px;
-  height: 20px;
+  width: 18px; /* Smaller */
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: 3px;
   transition: background-color 0.2s;
 }
 
 .job-filler-close:hover {
-  background-color: rgba(255, 122, 48, 0.2);
-  color: #ff7a30;
+  background-color: rgba(148, 137, 121, 0.2);
+  color: var(--accent-dark);
 }
 
 .job-filler-suggestions-list {
@@ -55,12 +55,12 @@
   flex-direction: column;
   padding: 8px 12px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(70, 92, 136, 0.1);
+  border-bottom: 1px solid rgba(148, 137, 121, 0.1);
   transition: background-color 0.2s;
 }
 
 .job-filler-suggestion-item:hover {
-  background-color: rgba(255, 122, 48, 0.1);
+  background-color: rgba(148, 137, 121, 0.1);
 }
 
 .job-filler-suggestion-item:last-child {
@@ -69,7 +69,7 @@
 
 .job-filler-suggestion-label {
   font-weight: 500;
-  color: #000000;
+  color: var(--primary-color);
   margin-bottom: 2px;
   font-size: 12px;
   text-transform: uppercase;
@@ -77,27 +77,27 @@
 }
 
 .job-filler-suggestion-value {
-  color: #465c88;
+  color: var(--gray-600);
   line-height: 1.4;
   word-break: break-word;
 }
 
 /* Scrollbar styling */
 .job-filler-suggestions-list::-webkit-scrollbar {
-  width: 6px;
+  width: 4px; /* Thinner scrollbar */
 }
 
 .job-filler-suggestions-list::-webkit-scrollbar-track {
-  background: rgba(233, 227, 223, 0.5);
+  background: rgba(223, 208, 184, 0.3);
 }
 
 .job-filler-suggestions-list::-webkit-scrollbar-thumb {
-  background: rgba(70, 92, 136, 0.4);
-  border-radius: 3px;
+  background: rgba(148, 137, 121, 0.6);
+  border-radius: 2px;
 }
 
 .job-filler-suggestions-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 122, 48, 0.6);
+  background: rgba(148, 137, 121, 0.8);
 }
 
 /* Animation for popup appearance */
@@ -118,8 +118,8 @@
 
 /* Highlight effect for auto-filled fields */
 .job-filler-field-filled {
-  background-color: rgba(255, 122, 48, 0.1) !important;
-  border-color: #ff7a30 !important;
+  background-color: rgba(148, 137, 121, 0.1) !important;
+  border-color: var(--accent-color) !important;
   transition: all 0.3s ease;
 }
 
@@ -128,10 +128,10 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  background: #ff7a30;
-  color: #e9e3df;
-  padding: 8px 12px;
-  border-radius: 6px;
+  background: var(--accent-color);
+  color: var(--primary-color);
+  padding: 6px 12px; /* Reduced height */
+  border-radius: 4px;
   font-size: 12px;
   z-index: 10001;
   animation: job-filler-slideIn 0.3s ease-out;
@@ -139,11 +139,8 @@
 }
 
 .job-filler-status.error {
-  background: #ef4444;
-}
-
-.job-filler-status.error {
-  background: #ef4444;
+  background: var(--error-color);
+  color: var(--white);
 }
 
 @keyframes job-filler-slideIn {
@@ -161,11 +158,11 @@
 .ai-indicator {
   display: inline-flex;
   align-items: center;
-  background: linear-gradient(45deg, #ff7a30, #465c88);
-  color: #e9e3df;
+  background: var(--accent-color);
+  color: var(--primary-color);
   font-size: 11px;
   padding: 2px 6px;
-  border-radius: 12px;
+  border-radius: 8px; /* Less rounded */
   margin-left: 8px;
   font-weight: 500;
 }
@@ -176,38 +173,38 @@
 }
 
 .openai-section {
-  background: rgba(255, 122, 48, 0.05);
-  border: 1px solid rgba(255, 122, 48, 0.3);
-  border-radius: 6px;
+  background: rgba(148, 137, 121, 0.05);
+  border: 1px solid rgba(148, 137, 121, 0.3);
+  border-radius: 4px;
   padding: 12px;
   margin: 8px 0;
 }
 
 .api-key-input {
   font-family: monospace;
-  background: rgba(233, 227, 223, 0.5);
-  border: 1px solid rgba(70, 92, 136, 0.3);
-  padding: 8px;
-  border-radius: 4px;
+  background: rgba(223, 208, 184, 0.5);
+  border: 1px solid rgba(148, 137, 121, 0.3);
+  padding: 6px; /* Reduced height */
+  border-radius: 3px;
   width: 100%;
-  color: #000000;
+  color: var(--primary-color);
 }
 
 .api-key-input:focus {
-  border-color: #ff7a30;
-  background: rgba(233, 227, 223, 0.8);
+  border-color: var(--accent-color);
+  background: rgba(223, 208, 184, 0.8);
   outline: none;
 }
 
 .api-key-help {
   font-size: 11px;
-  color: #465c88;
+  color: var(--gray-600);
   margin-top: 4px;
   line-height: 1.4;
 }
 
 .api-key-help a {
-  color: #ff7a30;
+  color: var(--accent-color);
   text-decoration: none;
   font-weight: 500;
 }
@@ -218,10 +215,10 @@
 
 .loading-spinner {
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(233, 227, 223, 0.3);
-  border-top: 2px solid #ff7a30;
+  width: 14px; /* Smaller */
+  height: 14px;
+  border: 2px solid rgba(223, 208, 184, 0.3);
+  border-top: 2px solid var(--accent-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-right: 8px;

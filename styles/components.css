@@ -56,42 +56,42 @@
 /* Tab Navigation */
 .tab-navigation {
   display: flex;
-  background: var(--gray-50);
+  background: var(--gray-800);
   border-radius: var(--radius-lg);
   margin: var(--space-md);
   padding: var(--space-xs);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--gray-200);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--gray-700);
 }
 
 .tab-button {
   flex: 1;
   background: none;
   border: none;
-  padding: var(--space-md) var(--space-sm);
+  padding: 8px var(--space-sm); /* Reduced height for minimalism */
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-medium);
   text-align: center;
   cursor: pointer;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
-  color: var(--gray-600);
+  color: var(--gray-400);
   position: relative;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  min-height: 32px; /* Explicit minimal height */
 }
 
 .tab-button.active {
-  background: var(--primary-color);
-  color: var(--white);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  background: var(--accent-color);
+  color: var(--primary-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  font-weight: var(--font-weight-semibold);
 }
 
 .tab-button:hover:not(.active) {
-  background: var(--gray-100);
-  color: var(--primary-color);
-  transform: translateY(-1px);
+  background: var(--gray-700);
+  color: var(--white);
 }
 
 /* Tab Content */
@@ -99,6 +99,8 @@
   display: none;
   padding: var(--space-lg);
   animation: fadeIn var(--transition-normal);
+  background: var(--white);
+  color: var(--primary-color);
 }
 
 .tab-content.active {
@@ -128,10 +130,10 @@
 .form-section h3 {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  color: var(--gray-900);
+  color: var(--primary-color);
   margin-bottom: var(--space-md);
   padding-bottom: var(--space-sm);
-  border-bottom: 2px solid var(--gray-100);
+  border-bottom: 2px solid var(--accent-color);
   display: flex;
   align-items: center;
   gap: var(--space-sm);
@@ -141,11 +143,7 @@
   content: "";
   width: 4px;
   height: 16px;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--accent-color)
-  );
+  background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
   border-radius: var(--radius-sm);
   flex-shrink: 0;
 }
@@ -166,7 +164,7 @@
   display: block;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--gray-700);
+  color: var(--primary-color);
   margin-bottom: var(--space-sm);
 }
 
@@ -174,27 +172,28 @@
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: var(--space-md);
-  border: 2px solid var(--gray-200);
-  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md); /* Reduced height */
+  border: 1px solid var(--gray-400); /* Thinner border */
+  border-radius: var(--radius-sm); /* Smaller radius */
   font-size: var(--font-size-sm);
   transition: all var(--transition-fast);
   background: var(--white);
-  color: var(--gray-900);
+  color: var(--primary-color);
   font-family: inherit;
+  min-height: 32px; /* Consistent with buttons */
 }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-  color: var(--gray-400);
+  color: var(--gray-500);
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(148, 137, 121, 0.2); /* Using accent color */
   background: var(--white);
 }
 
@@ -203,38 +202,37 @@
   min-height: 80px;
 }
 
-/* Buttons */
+/* Buttons - Minimalistic Design */
 .btn {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
-  color: var(--white);
+  background: var(--accent-color);
+  color: var(--primary-color);
   border: none;
-  padding: var(--space-md) var(--space-lg);
-  border-radius: var(--radius-md);
+  padding: 8px var(--space-lg); /* Reduced height from var(--space-md) */
+  border-radius: var(--radius-sm); /* Smaller radius for minimalism */
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
-  box-shadow: var(--shadow-md);
   text-decoration: none;
   font-family: inherit;
   line-height: 1;
+  min-height: 32px; /* Explicit minimal height */
+  box-shadow: none; /* Remove shadow for cleaner look */
 }
 
 .btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  background: var(--accent-light);
+  transform: none; /* Remove transform for minimalism */
+  box-shadow: none;
 }
 
 .btn:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-sm);
+  background: var(--accent-dark);
+  transform: none;
+  box-shadow: none;
 }
 
 .btn:disabled {
@@ -244,26 +242,29 @@
 }
 
 .btn-secondary {
-  background: var(--gray-100);
-  color: var(--gray-700);
-  box-shadow: var(--shadow-sm);
+  background: var(--gray-700);
+  color: var(--white);
+  box-shadow: none;
 }
 
 .btn-secondary:hover {
-  background: var(--gray-200);
-  box-shadow: var(--shadow-md);
+  background: var(--gray-600);
+  box-shadow: none;
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, var(--error-color), #dc2626);
+  background: var(--error-color);
+  color: var(--white);
 }
 
 .btn-success {
-  background: linear-gradient(135deg, var(--success-color), #059669);
+  background: var(--success-color);
+  color: var(--white);
 }
 
 .btn-warning {
-  background: linear-gradient(135deg, var(--warning-color), var(--accent-dark));
+  background: var(--warning-color);
+  color: var(--primary-color);
 }
 
 .action-buttons {
@@ -275,17 +276,18 @@
 
 /* Small Button Variant */
 .btn-sm {
-  padding: var(--space-sm) var(--space-md);
+  padding: 6px var(--space-md); /* Even smaller height */
   font-size: var(--font-size-xs);
+  min-height: 28px;
 }
 
 /* Icon Buttons */
 .btn-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px; /* Smaller icon buttons */
+  height: 32px;
   padding: 0;
   justify-content: center;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md); /* Less rounded for minimalism */
 }
 
 /* Loading State */
