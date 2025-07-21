@@ -1,0 +1,32 @@
+{
+    "name": "ai-job-application-filler",
+    "version": "1.0.0",
+    "description": "Chrome extension for automatically filling job applications using AI and saved data",
+    "main": "background.js",
+    "scripts": {
+        "build": "echo 'Building extension...' && npm run validate",
+        "validate": "echo 'Validating manifest...' && node -e \"console.log('Manifest valid:', JSON.parse(require('fs').readFileSync('manifest.json', 'utf8')))\"",
+        "dev": "echo 'Development mode - Load unpacked extension in Chrome'",
+        "zip": "zip -r ai-job-application-filler.zip . -x '*.git*' 'node_modules/*' '*.zip' '*.md'"
+    },
+    "keywords": [
+        "chrome-extension",
+        "job-application",
+        "autofill",
+        "ai",
+        "career",
+        "productivity"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yourusername/ai-job-application-filler.git"
+    },
+    "devDependencies": {
+        "web-ext": "^7.0.0"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
+}

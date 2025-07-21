@@ -1,0 +1,249 @@
+/* Styles for the job application filler extension */
+
+.job-filler-suggestions {
+  background: #e9e3df;
+  border: 1px solid rgba(70, 92, 136, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  max-width: 300px;
+  min-width: 200px;
+  z-index: 10000;
+}
+
+.job-filler-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(70, 92, 136, 0.1);
+  border-bottom: 1px solid rgba(70, 92, 136, 0.2);
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  color: #000000;
+}
+
+.job-filler-close {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #465c88;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.job-filler-close:hover {
+  background-color: rgba(255, 122, 48, 0.2);
+  color: #ff7a30;
+}
+
+.job-filler-suggestions-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.job-filler-suggestion-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(70, 92, 136, 0.1);
+  transition: background-color 0.2s;
+}
+
+.job-filler-suggestion-item:hover {
+  background-color: rgba(255, 122, 48, 0.1);
+}
+
+.job-filler-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.job-filler-suggestion-label {
+  font-weight: 500;
+  color: #000000;
+  margin-bottom: 2px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.job-filler-suggestion-value {
+  color: #465c88;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* Scrollbar styling */
+.job-filler-suggestions-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.job-filler-suggestions-list::-webkit-scrollbar-track {
+  background: rgba(233, 227, 223, 0.5);
+}
+
+.job-filler-suggestions-list::-webkit-scrollbar-thumb {
+  background: rgba(70, 92, 136, 0.4);
+  border-radius: 3px;
+}
+
+.job-filler-suggestions-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 122, 48, 0.6);
+}
+
+/* Animation for popup appearance */
+.job-filler-suggestions {
+  animation: job-filler-fadeIn 0.2s ease-out;
+}
+
+@keyframes job-filler-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Highlight effect for auto-filled fields */
+.job-filler-field-filled {
+  background-color: rgba(255, 122, 48, 0.1) !important;
+  border-color: #ff7a30 !important;
+  transition: all 0.3s ease;
+}
+
+/* Status indicator */
+.job-filler-status {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #ff7a30;
+  color: #e9e3df;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  z-index: 10001;
+  animation: job-filler-slideIn 0.3s ease-out;
+  font-weight: 600;
+}
+
+.job-filler-status.error {
+  background: #ef4444;
+}
+
+.job-filler-status.error {
+  background: #ef4444;
+}
+
+@keyframes job-filler-slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* OpenAI Integration Styles */
+.ai-indicator {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(45deg, #ff7a30, #465c88);
+  color: #e9e3df;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+.ai-indicator::before {
+  content: "🤖";
+  margin-right: 4px;
+}
+
+.openai-section {
+  background: rgba(255, 122, 48, 0.05);
+  border: 1px solid rgba(255, 122, 48, 0.3);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+}
+
+.api-key-input {
+  font-family: monospace;
+  background: rgba(233, 227, 223, 0.5);
+  border: 1px solid rgba(70, 92, 136, 0.3);
+  padding: 8px;
+  border-radius: 4px;
+  width: 100%;
+  color: #000000;
+}
+
+.api-key-input:focus {
+  border-color: #ff7a30;
+  background: rgba(233, 227, 223, 0.8);
+  outline: none;
+}
+
+.api-key-help {
+  font-size: 11px;
+  color: #465c88;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.api-key-help a {
+  color: #ff7a30;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.api-key-help a:hover {
+  text-decoration: underline;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(233, 227, 223, 0.3);
+  border-top: 2px solid #ff7a30;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .job-filler-suggestions {
+    max-width: 280px;
+    font-size: 13px;
+  }
+
+  .job-filler-suggestion-item {
+    padding: 10px 12px;
+  }
+}

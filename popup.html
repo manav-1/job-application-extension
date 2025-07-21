@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/ui-components.css">
+    <link rel="stylesheet" href="styles/utilities.css">
+    <link rel="stylesheet" href="styles/enhancements.css">
+  </head>
+  <body>
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="header">
+      <h1>🚀 AI Job Assistant</h1>
+      <div class="subtitle">Smart application filling with AI power</div>
+    </div>
+
+    <div class="main-content">
+      <div class="tab-navigation">
+        <button class="tab-button active" data-tab="profile">Profile</button>
+        <button class="tab-button" data-tab="experience">Experience</button>
+        <button class="tab-button" data-tab="ai">AI Settings</button>
+        <button class="tab-button" data-tab="applications">Apps</button>
+        <button class="tab-button" data-tab="settings">Settings</button>
+      </div>
+
+      <!-- Profile Tab -->
+      <div id="profile" class="tab-content active">
+        <div class="form-section">
+          <h3>📋 Personal Information</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" id="firstName" placeholder="John" />
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" id="lastName" placeholder="Doe" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" placeholder="john@example.com" />
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" placeholder="+1 (555) 123-4567" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="address">Street Address</label>
+            <input type="text" id="address" placeholder="123 Main Street" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" id="city" placeholder="San Francisco" />
+            </div>
+            <div class="form-group">
+              <label for="state">State/Province</label>
+              <input type="text" id="state" placeholder="CA" />
+            </div>
+            <div class="form-group">
+              <label for="zipCode">ZIP Code</label>
+              <input type="text" id="zipCode" placeholder="94105" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="linkedinUrl">LinkedIn Profile</label>
+              <input type="url" id="linkedinUrl" placeholder="https://linkedin.com/in/johndoe" />
+            </div>
+            <div class="form-group">
+              <label for="portfolioUrl">Portfolio/Website</label>
+              <input type="url" id="portfolioUrl" placeholder="https://johndoe.dev" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>🛠️ Skills & Expertise</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <input
+                type="text"
+                id="skillInput"
+                placeholder="Add a skill and press Enter (e.g., JavaScript, React, Python)"
+              />
+            </div>
+            <button id="addSkill" class="btn btn-secondary btn-sm">
+              ➕ Add Skill
+            </button>
+          </div>
+          <div id="skillsContainer" class="skill-container">
+            <!-- Skills will be added here dynamically -->
+          </div>
+          <div class="help-text">
+            💡 Add relevant skills to improve job matching and form filling accuracy
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button id="saveProfile" class="btn">
+            💾 Save Profile
+          </button>
+          <button id="fillForm" class="btn btn-success">
+            ✨ Smart Fill Form
+          </button>
+          <button id="clearProfile" class="btn btn-secondary">
+            🗑️ Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Experience Tab -->
+      <div id="experience" class="tab-content">
+        <div class="form-section">
+          <h3>💼 Work Experience</h3>
+          <div class="mb-4">
+            <button id="addExperience" class="btn btn-secondary">
+              ➕ Add Work Experience
+            </button>
+          </div>
+          <div id="experienceList">
+            <!-- Experience items will be added here -->
+            <div class="empty-state" id="experienceEmpty">
+              <div class="empty-state-icon">💼</div>
+              <h3>No work experience added</h3>
+              <p>Add your professional experience to improve job applications</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>🎓 Education</h3>
+          <div class="mb-4">
+            <button id="addEducation" class="btn btn-secondary">
+              ➕ Add Education
+            </button>
+          </div>
+          <div id="educationList">
+            <!-- Education items will be added here -->
+            <div class="empty-state" id="educationEmpty">
+              <div class="empty-state-icon">🎓</div>
+              <h3>No education added</h3>
+              <p>Add your educational background for better job matching</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button id="saveExperience" class="btn">
+            💾 Save Changes
+          </button>
+          <button id="importResume" class="btn btn-secondary">
+            📄 Import from Resume
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Settings Tab -->
+      <div id="ai" class="tab-content">
+        <div class="ai-provider-section">
+          <h3>🤖 AI Configuration</h3>
+
+          <div id="aiStatus" class="ai-status disconnected">
+            <div class="ai-status-icon"></div>
+            <span>AI Provider: Not Connected</span>
+          </div>
+
+          <div class="form-group">
+            <label for="aiProvider">Choose AI Provider</label>
+            <select id="aiProvider">
+              <option value="">Select AI Provider</option>
+              <option value="openai">🤖 OpenAI (GPT-3.5 Turbo)</option>
+              <option value="gemini">🧠 Google Gemini Pro</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="apiKey">API Key</label>
+            <input
+              type="password"
+              id="apiKey"
+              placeholder="Enter your API key"
+            />
+            <div id="apiHelp" class="help-text">
+              <span id="openaiHelp">
+                🔑 Get your API key from
+                <a href="https://platform.openai.com/api-keys" target="_blank"
+                  >OpenAI Platform</a
+                >
+              </span>
+              <span id="geminiHelp" style="display: none">
+                🔑 Get your API key from
+                <a
+                  href="https://makersuite.google.com/app/apikey"
+                  target="_blank"
+                  >Google AI Studio</a
+                >
+              </span>
+            </div>
+          </div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" id="enableAI" />
+            <label for="enableAI">Enable AI-powered features</label>
+          </div>
+
+          <div id="aiFeatures" style="display: none; margin-left: 20px">
+            <div class="checkbox-group">
+              <input type="checkbox" id="enableCoverLetters" />
+              <label for="enableCoverLetters">📝 AI Cover Letter Generation</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="enableInterviewPrep" />
+              <label for="enableInterviewPrep">❓ Interview Question Generation</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="enableJobMatching" />
+              <label for="enableJobMatching">🎯 Smart Job Matching</label>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button id="testConnection" class="btn btn-secondary btn-sm">
+              🔗 Test Connection
+            </button>
+            <button id="saveAIConfig" class="btn btn-sm">
+              💾 Save Configuration
+            </button>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>🚀 AI Tools</h3>
+          <div class="action-buttons">
+            <button id="generateCoverLetter" class="btn" disabled>
+              📝 Generate Cover Letter
+            </button>
+            <button id="generateInterviewQuestions" class="btn" disabled>
+              ❓ Interview Prep
+            </button>
+            <button id="optimizeProfile" class="btn" disabled>
+              ⚡ Optimize Profile
+            </button>
+          </div>
+          <div class="help-text">
+            💡 AI tools require a valid API key and enabled AI features
+          </div>
+        </div>
+      </div>
+
+      <!-- Applications Tab -->
+      <div id="applications" class="tab-content">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-number" id="totalApps">0</span>
+            <div class="stat-label">Total Applications</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="thisWeek">0</span>
+            <div class="stat-label">This Week</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="interviewCount">0</span>
+            <div class="stat-label">Interviews</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="responseRate">0%</span>
+            <div class="stat-label">Response Rate</div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="flex justify-between items-center mb-4">
+            <h3>📊 Application Tracker</h3>
+            <div class="action-buttons">
+              <button id="exportApplications" class="btn btn-secondary btn-sm">
+                📤 Export
+              </button>
+              <button id="refreshApplications" class="btn btn-sm">
+                🔄 Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="applicationsList">
+          <div class="empty-state">
+            <div class="empty-state-icon">📄</div>
+            <h3>No applications tracked yet</h3>
+            <p>Start by filling job applications to track your progress</p>
+            <div class="action-buttons mt-4">
+              <button class="btn btn-secondary btn-sm" onclick="document.querySelector('[data-tab=profile]').click()">
+                ✨ Set Up Profile First
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div id="settings" class="tab-content">
+        <div class="form-section">
+          <h3>💾 Data Management</h3>
+          <div class="action-buttons">
+            <button id="exportData" class="btn btn-secondary">
+              📤 Export All Data
+            </button>
+            <button id="importData" class="btn btn-secondary">
+              📥 Import Data
+            </button>
+          </div>
+          <div class="help-text mt-4">
+            Export your profile, experience, and application data as JSON for backup or transfer to another device.
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>🎨 Appearance</h3>
+          <div class="checkbox-group">
+            <input type="checkbox" id="enableAnimations" checked />
+            <label for="enableAnimations">Enable animations and transitions</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="compactMode" />
+            <label for="compactMode">Compact mode (smaller spacing)</label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>🔔 Notifications</h3>
+          <div class="checkbox-group">
+            <input type="checkbox" id="enableNotifications" />
+            <label for="enableNotifications">Enable browser notifications</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="reminderNotifications" />
+            <label for="reminderNotifications">Application deadline reminders</label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>🔐 Privacy & Security</h3>
+          <div class="checkbox-group">
+            <input type="checkbox" id="autoSave" checked />
+            <label for="autoSave">Auto-save form data</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="encryptData" />
+            <label for="encryptData">Encrypt sensitive data locally</label>
+          </div>
+          <div class="help-text">
+            Your data is stored locally on your device and never sent to third parties without your explicit consent.
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>⚠️ Danger Zone</h3>
+          <div class="action-buttons">
+            <button id="clearApplications" class="btn btn-warning">
+              🗑️ Clear Applications Only
+            </button>
+            <button id="clearData" class="btn btn-danger">
+              💥 Reset Everything
+            </button>
+          </div>
+          <div class="help-text text-error">
+            ⚠️ These actions cannot be undone. Consider exporting your data first.
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>ℹ️ About</h3>
+          <div class="text-sm text-gray-600">
+            <p><strong>AI Job Assistant</strong> - Version 2.0</p>
+            <p>Made with ❤️ to help streamline your job application process</p>
+            <div class="mt-4">
+              <a href="#" class="text-primary">📖 User Guide</a> •
+              <a href="#" class="text-primary">🐛 Report Bug</a> •
+              <a href="#" class="text-primary">💡 Feature Request</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="file" id="importFile" accept=".json" style="display: none" />
+    <script src="src/utils/UIEnhancements.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
