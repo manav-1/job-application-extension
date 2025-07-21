@@ -2,12 +2,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles/base.css">
-    <link rel="stylesheet" href="styles/components.css">
-    <link rel="stylesheet" href="styles/ui-components.css">
-    <link rel="stylesheet" href="styles/utilities.css">
-    <link rel="stylesheet" href="styles/enhancements.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/components.css" />
+    <link rel="stylesheet" href="styles/ui-components.css" />
+    <link rel="stylesheet" href="styles/utilities.css" />
+    <link rel="stylesheet" href="styles/enhancements.css" />
   </head>
   <body>
     <!-- Toast Notification Container -->
@@ -76,11 +76,19 @@
           <div class="form-row">
             <div class="form-group">
               <label for="linkedinUrl">LinkedIn Profile</label>
-              <input type="url" id="linkedinUrl" placeholder="https://linkedin.com/in/johndoe" />
+              <input
+                type="url"
+                id="linkedinUrl"
+                placeholder="https://linkedin.com/in/johndoe"
+              />
             </div>
             <div class="form-group">
               <label for="portfolioUrl">Portfolio/Website</label>
-              <input type="url" id="portfolioUrl" placeholder="https://johndoe.dev" />
+              <input
+                type="url"
+                id="portfolioUrl"
+                placeholder="https://johndoe.dev"
+              />
             </div>
           </div>
         </div>
@@ -103,20 +111,17 @@
             <!-- Skills will be added here dynamically -->
           </div>
           <div class="help-text">
-            💡 Add relevant skills to improve job matching and form filling accuracy
+            💡 Add relevant skills to improve job matching and form filling
+            accuracy
           </div>
         </div>
 
         <div class="action-buttons">
-          <button id="saveProfile" class="btn">
-            💾 Save Profile
-          </button>
+          <button id="saveProfile" class="btn">💾 Save Profile</button>
           <button id="fillForm" class="btn btn-success">
             ✨ Smart Fill Form
           </button>
-          <button id="clearProfile" class="btn btn-secondary">
-            🗑️ Clear
-          </button>
+          <button id="clearProfile" class="btn btn-secondary">🗑️ Clear</button>
         </div>
       </div>
 
@@ -134,7 +139,9 @@
             <div class="empty-state" id="experienceEmpty">
               <div class="empty-state-icon">💼</div>
               <h3>No work experience added</h3>
-              <p>Add your professional experience to improve job applications</p>
+              <p>
+                Add your professional experience to improve job applications
+              </p>
             </div>
           </div>
         </div>
@@ -157,9 +164,7 @@
         </div>
 
         <div class="action-buttons">
-          <button id="saveExperience" class="btn">
-            💾 Save Changes
-          </button>
+          <button id="saveExperience" class="btn">💾 Save Changes</button>
           <button id="importResume" class="btn btn-secondary">
             📄 Import from Resume
           </button>
@@ -218,11 +223,15 @@
           <div id="aiFeatures" style="display: none; margin-left: 20px">
             <div class="checkbox-group">
               <input type="checkbox" id="enableCoverLetters" />
-              <label for="enableCoverLetters">📝 AI Cover Letter Generation</label>
+              <label for="enableCoverLetters"
+                >📝 AI Cover Letter Generation</label
+              >
             </div>
             <div class="checkbox-group">
               <input type="checkbox" id="enableInterviewPrep" />
-              <label for="enableInterviewPrep">❓ Interview Question Generation</label>
+              <label for="enableInterviewPrep"
+                >❓ Interview Question Generation</label
+              >
             </div>
             <div class="checkbox-group">
               <input type="checkbox" id="enableJobMatching" />
@@ -300,7 +309,10 @@
             <h3>No applications tracked yet</h3>
             <p>Start by filling job applications to track your progress</p>
             <div class="action-buttons mt-4">
-              <button class="btn btn-secondary btn-sm" onclick="document.querySelector('[data-tab=profile]').click()">
+              <button
+                class="btn btn-secondary btn-sm"
+                onclick="document.querySelector('[data-tab=profile]').click()"
+              >
                 ✨ Set Up Profile First
               </button>
             </div>
@@ -321,7 +333,8 @@
             </button>
           </div>
           <div class="help-text mt-4">
-            Export your profile, experience, and application data as JSON for backup or transfer to another device.
+            Export your profile, experience, and application data as JSON for
+            backup or transfer to another device.
           </div>
         </div>
 
@@ -329,7 +342,9 @@
           <h3>🎨 Appearance</h3>
           <div class="checkbox-group">
             <input type="checkbox" id="enableAnimations" checked />
-            <label for="enableAnimations">Enable animations and transitions</label>
+            <label for="enableAnimations"
+              >Enable animations and transitions</label
+            >
           </div>
           <div class="checkbox-group">
             <input type="checkbox" id="compactMode" />
@@ -341,11 +356,15 @@
           <h3>🔔 Notifications</h3>
           <div class="checkbox-group">
             <input type="checkbox" id="enableNotifications" />
-            <label for="enableNotifications">Enable browser notifications</label>
+            <label for="enableNotifications"
+              >Enable browser notifications</label
+            >
           </div>
           <div class="checkbox-group">
             <input type="checkbox" id="reminderNotifications" />
-            <label for="reminderNotifications">Application deadline reminders</label>
+            <label for="reminderNotifications"
+              >Application deadline reminders</label
+            >
           </div>
         </div>
 
@@ -360,7 +379,8 @@
             <label for="encryptData">Encrypt sensitive data locally</label>
           </div>
           <div class="help-text">
-            Your data is stored locally on your device and never sent to third parties without your explicit consent.
+            Your data is stored locally on your device and never sent to third
+            parties without your explicit consent.
           </div>
         </div>
 
@@ -375,7 +395,8 @@
             </button>
           </div>
           <div class="help-text text-error">
-            ⚠️ These actions cannot be undone. Consider exporting your data first.
+            ⚠️ These actions cannot be undone. Consider exporting your data
+            first.
           </div>
         </div>
 

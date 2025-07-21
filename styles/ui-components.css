@@ -20,7 +20,11 @@
 }
 
 .skill-tag {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   color: var(--white);
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-full);
@@ -143,7 +147,11 @@
 
 /* AI Provider Section */
 .ai-provider-section {
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(245, 158, 11, 0.05));
+  background: linear-gradient(
+    135deg,
+    rgba(79, 70, 229, 0.05),
+    rgba(245, 158, 11, 0.05)
+  );
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   margin-bottom: var(--space-lg);
@@ -182,7 +190,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

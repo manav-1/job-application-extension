@@ -1,225 +1,295 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Job Assistant - UI Demo</title>
-    <link rel="stylesheet" href="styles/base.css">
-    <link rel="stylesheet" href="styles/components.css">
-    <link rel="stylesheet" href="styles/ui-components.css">
-    <link rel="stylesheet" href="styles/utilities.css">
-    <link rel="stylesheet" href="styles/enhancements.css">
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/components.css" />
+    <link rel="stylesheet" href="styles/ui-components.css" />
+    <link rel="stylesheet" href="styles/utilities.css" />
+    <link rel="stylesheet" href="styles/enhancements.css" />
     <style>
-        body { 
-            padding: 20px; 
-            background: var(--gray-100); 
-            width: auto; 
-            min-height: auto; 
-        }
-        .demo-section {
-            background: var(--white);
-            padding: var(--space-lg);
-            margin-bottom: var(--space-lg);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-        }
-        .demo-section h2 {
-            margin-bottom: var(--space-md);
-            color: var(--primary-color);
-        }
+      body {
+        padding: 20px;
+        background: var(--gray-100);
+        width: auto;
+        min-height: auto;
+      }
+      .demo-section {
+        background: var(--white);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+      }
+      .demo-section h2 {
+        margin-bottom: var(--space-md);
+        color: var(--primary-color);
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="toast-container" id="toastContainer"></div>
 
     <div class="demo-section">
-        <h2>🎨 UI Components Demo</h2>
-        <p>This page demonstrates the improved UI components of the AI Job Assistant extension.</p>
+      <h2>🎨 UI Components Demo</h2>
+      <p>
+        This page demonstrates the improved UI components of the AI Job
+        Assistant extension.
+      </p>
     </div>
 
     <div class="demo-section">
-        <h2>🔘 Buttons</h2>
-        <div class="action-buttons">
-            <button class="btn" onclick="showDemo('success')">Primary Button</button>
-            <button class="btn btn-secondary" onclick="showDemo('info')">Secondary Button</button>
-            <button class="btn btn-success" onclick="showDemo('success')">Success Button</button>
-            <button class="btn btn-warning" onclick="showDemo('warning')">Warning Button</button>
-            <button class="btn btn-danger" onclick="showDemo('error')">Danger Button</button>
-        </div>
-        <div class="action-buttons">
-            <button class="btn btn-sm" onclick="showDemo('info')">Small Button</button>
-            <button class="btn btn-icon">🔍</button>
-            <button class="btn" disabled>Disabled Button</button>
-        </div>
+      <h2>🔘 Buttons</h2>
+      <div class="action-buttons">
+        <button class="btn" onclick="showDemo('success')">
+          Primary Button
+        </button>
+        <button class="btn btn-secondary" onclick="showDemo('info')">
+          Secondary Button
+        </button>
+        <button class="btn btn-success" onclick="showDemo('success')">
+          Success Button
+        </button>
+        <button class="btn btn-warning" onclick="showDemo('warning')">
+          Warning Button
+        </button>
+        <button class="btn btn-danger" onclick="showDemo('error')">
+          Danger Button
+        </button>
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-sm" onclick="showDemo('info')">
+          Small Button
+        </button>
+        <button class="btn btn-icon">🔍</button>
+        <button class="btn" disabled>Disabled Button</button>
+      </div>
     </div>
 
     <div class="demo-section">
-        <h2>📝 Form Elements</h2>
-        <div class="form-row">
-            <div class="form-group">
-                <label for="demoInput">Text Input</label>
-                <input type="text" id="demoInput" placeholder="Type something here...">
-            </div>
-            <div class="form-group">
-                <label for="demoSelect">Select Dropdown</label>
-                <select id="demoSelect">
-                    <option value="">Choose an option</option>
-                    <option value="1">Option 1</option>
-                    <option value="2">Option 2</option>
-                </select>
-            </div>
+      <h2>📝 Form Elements</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="demoInput">Text Input</label>
+          <input
+            type="text"
+            id="demoInput"
+            placeholder="Type something here..."
+          />
         </div>
         <div class="form-group">
-            <label for="demoTextarea">Textarea</label>
-            <textarea id="demoTextarea" placeholder="Enter multiple lines of text..."></textarea>
+          <label for="demoSelect">Select Dropdown</label>
+          <select id="demoSelect">
+            <option value="">Choose an option</option>
+            <option value="1">Option 1</option>
+            <option value="2">Option 2</option>
+          </select>
         </div>
-        <div class="checkbox-group">
-            <input type="checkbox" id="demoCheckbox">
-            <label for="demoCheckbox">Enable notifications</label>
-        </div>
+      </div>
+      <div class="form-group">
+        <label for="demoTextarea">Textarea</label>
+        <textarea
+          id="demoTextarea"
+          placeholder="Enter multiple lines of text..."
+        ></textarea>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="demoCheckbox" />
+        <label for="demoCheckbox">Enable notifications</label>
+      </div>
     </div>
 
     <div class="demo-section">
-        <h2>🏷️ Status Badges</h2>
-        <div class="flex gap-2 flex-wrap">
-            <span class="status-badge status-draft">Draft</span>
-            <span class="status-badge status-applied">Applied</span>
-            <span class="status-badge status-interview">Interview</span>
-            <span class="status-badge status-offer">Offer</span>
-            <span class="status-badge status-rejected">Rejected</span>
-        </div>
+      <h2>🏷️ Status Badges</h2>
+      <div class="flex gap-2 flex-wrap">
+        <span class="status-badge status-draft">Draft</span>
+        <span class="status-badge status-applied">Applied</span>
+        <span class="status-badge status-interview">Interview</span>
+        <span class="status-badge status-offer">Offer</span>
+        <span class="status-badge status-rejected">Rejected</span>
+      </div>
     </div>
 
     <div class="demo-section">
-        <h2>🛠️ Skills Container</h2>
-        <div class="skill-container">
-            <div class="skill-tag">
-                JavaScript
-                <button class="remove-btn">×</button>
-            </div>
-            <div class="skill-tag">
-                React
-                <button class="remove-btn">×</button>
-            </div>
-            <div class="skill-tag">
-                Node.js
-                <button class="remove-btn">×</button>
-            </div>
-            <div class="skill-tag">
-                Python
-                <button class="remove-btn">×</button>
-            </div>
+      <h2>🛠️ Skills Container</h2>
+      <div class="skill-container">
+        <div class="skill-tag">
+          JavaScript
+          <button class="remove-btn">×</button>
         </div>
+        <div class="skill-tag">
+          React
+          <button class="remove-btn">×</button>
+        </div>
+        <div class="skill-tag">
+          Node.js
+          <button class="remove-btn">×</button>
+        </div>
+        <div class="skill-tag">
+          Python
+          <button class="remove-btn">×</button>
+        </div>
+      </div>
     </div>
 
     <div class="demo-section">
-        <h2>📊 Statistics</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-number">25</span>
-                <div class="stat-label">Applications</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">5</span>
-                <div class="stat-label">Interviews</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">2</span>
-                <div class="stat-label">Offers</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">20%</span>
-                <div class="stat-label">Success Rate</div>
-            </div>
+      <h2>📊 Statistics</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-number">25</span>
+          <div class="stat-label">Applications</div>
         </div>
+        <div class="stat-card">
+          <span class="stat-number">5</span>
+          <div class="stat-label">Interviews</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">2</span>
+          <div class="stat-label">Offers</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">20%</span>
+          <div class="stat-label">Success Rate</div>
+        </div>
+      </div>
     </div>
 
     <div class="demo-section">
-        <h2>📈 Progress Bar</h2>
-        <div class="progress-bar">
-            <div class="progress-fill" style="width: 65%"></div>
-        </div>
-        <div class="action-buttons mt-4">
-            <button class="btn btn-secondary btn-sm" onclick="updateProgress(25)">25%</button>
-            <button class="btn btn-secondary btn-sm" onclick="updateProgress(50)">50%</button>
-            <button class="btn btn-secondary btn-sm" onclick="updateProgress(75)">75%</button>
-            <button class="btn btn-secondary btn-sm" onclick="updateProgress(100)">100%</button>
-        </div>
+      <h2>📈 Progress Bar</h2>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 65%"></div>
+      </div>
+      <div class="action-buttons mt-4">
+        <button class="btn btn-secondary btn-sm" onclick="updateProgress(25)">
+          25%
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="updateProgress(50)">
+          50%
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="updateProgress(75)">
+          75%
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="updateProgress(100)">
+          100%
+        </button>
+      </div>
     </div>
 
     <div class="demo-section">
-        <h2>🔔 Notifications</h2>
-        <p>Click these buttons to see different types of notifications:</p>
-        <div class="action-buttons">
-            <button class="btn btn-success" onclick="notifications.success('Operation completed successfully!')">Success Toast</button>
-            <button class="btn btn-danger" onclick="notifications.error('Something went wrong!')">Error Toast</button>
-            <button class="btn btn-warning" onclick="notifications.warning('Please review your settings')">Warning Toast</button>
-            <button class="btn" onclick="notifications.info('Here is some useful information')">Info Toast</button>
-        </div>
+      <h2>🔔 Notifications</h2>
+      <p>Click these buttons to see different types of notifications:</p>
+      <div class="action-buttons">
+        <button
+          class="btn btn-success"
+          onclick="notifications.success('Operation completed successfully!')"
+        >
+          Success Toast
+        </button>
+        <button
+          class="btn btn-danger"
+          onclick="notifications.error('Something went wrong!')"
+        >
+          Error Toast
+        </button>
+        <button
+          class="btn btn-warning"
+          onclick="notifications.warning('Please review your settings')"
+        >
+          Warning Toast
+        </button>
+        <button
+          class="btn"
+          onclick="notifications.info('Here is some useful information')"
+        >
+          Info Toast
+        </button>
+      </div>
     </div>
 
     <div class="demo-section">
-        <h2>🎯 Interactive Features</h2>
-        <div class="action-buttons">
-            <button class="btn" onclick="showModal()">Show Modal</button>
-            <button class="btn btn-secondary" onclick="showLoading()">Loading Demo</button>
-            <button class="btn btn-secondary" onclick="animateCounter()">Animate Counter</button>
-        </div>
-        <div id="counterDemo" class="stat-card mt-4" style="display: inline-block;">
-            <span class="stat-number" id="demoCounter">0</span>
-            <div class="stat-label">Animated Counter</div>
-        </div>
+      <h2>🎯 Interactive Features</h2>
+      <div class="action-buttons">
+        <button class="btn" onclick="showModal()">Show Modal</button>
+        <button class="btn btn-secondary" onclick="showLoading()">
+          Loading Demo
+        </button>
+        <button class="btn btn-secondary" onclick="animateCounter()">
+          Animate Counter
+        </button>
+      </div>
+      <div
+        id="counterDemo"
+        class="stat-card mt-4"
+        style="display: inline-block"
+      >
+        <span class="stat-number" id="demoCounter">0</span>
+        <div class="stat-label">Animated Counter</div>
+      </div>
     </div>
 
     <script src="src/utils/UIEnhancements.js"></script>
     <script>
-        function showDemo(type) {
-            const messages = {
-                success: 'This is a success message!',
-                error: 'This is an error message!',
-                warning: 'This is a warning message!',
-                info: 'This is an info message!'
-            };
-            notifications.showToast(messages[type], type);
-        }
+      function showDemo(type) {
+        const messages = {
+          success: "This is a success message!",
+          error: "This is an error message!",
+          warning: "This is a warning message!",
+          info: "This is an info message!",
+        };
+        notifications.showToast(messages[type], type);
+      }
 
-        function updateProgress(percentage) {
-            const progressBar = document.querySelector('.progress-fill');
-            UIEnhancements.updateProgressBar(progressBar.parentElement, percentage);
-        }
+      function updateProgress(percentage) {
+        const progressBar = document.querySelector(".progress-fill");
+        UIEnhancements.updateProgressBar(progressBar.parentElement, percentage);
+      }
 
-        function showModal() {
-            UIEnhancements.createModal(
-                'Demo Modal',
-                '<p>This is a demonstration of the modal dialog system. You can put any content here including forms, images, or other interactive elements.</p>',
-                [
-                    { text: 'Cancel', class: 'btn-secondary', onclick: 'this.closest(".modal-overlay").remove()' },
-                    { text: 'Confirm', class: 'btn-success', onclick: 'notifications.success("Action confirmed!"); this.closest(".modal-overlay").remove();' }
-                ]
-            );
-        }
+      function showModal() {
+        UIEnhancements.createModal(
+          "Demo Modal",
+          "<p>This is a demonstration of the modal dialog system. You can put any content here including forms, images, or other interactive elements.</p>",
+          [
+            {
+              text: "Cancel",
+              class: "btn-secondary",
+              onclick: 'this.closest(".modal-overlay").remove()',
+            },
+            {
+              text: "Confirm",
+              class: "btn-success",
+              onclick:
+                'notifications.success("Action confirmed!"); this.closest(".modal-overlay").remove();',
+            },
+          ]
+        );
+      }
 
-        function showLoading() {
-            const button = event.target;
-            const overlay = UIEnhancements.showLoadingOverlay(button.parentElement, 'Processing...');
-            setTimeout(() => {
-                UIEnhancements.hideLoadingOverlay(button.parentElement);
-                notifications.success('Loading demo completed!');
-            }, 3000);
-        }
+      function showLoading() {
+        const button = event.target;
+        const overlay = UIEnhancements.showLoadingOverlay(
+          button.parentElement,
+          "Processing..."
+        );
+        setTimeout(() => {
+          UIEnhancements.hideLoadingOverlay(button.parentElement);
+          notifications.success("Loading demo completed!");
+        }, 3000);
+      }
 
-        function animateCounter() {
-            const counter = document.getElementById('demoCounter');
-            const randomTarget = Math.floor(Math.random() * 1000) + 100;
-            UIEnhancements.animateCounter(counter, randomTarget);
-        }
+      function animateCounter() {
+        const counter = document.getElementById("demoCounter");
+        const randomTarget = Math.floor(Math.random() * 1000) + 100;
+        UIEnhancements.animateCounter(counter, randomTarget);
+      }
 
-        // Add ripple effects to all buttons
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.btn').forEach(button => {
-                UIEnhancements.addRippleEffect(button);
-            });
+      // Add ripple effects to all buttons
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".btn").forEach((button) => {
+          UIEnhancements.addRippleEffect(button);
         });
+      });
     </script>
-</body>
+  </body>
 </html>

@@ -1,35 +1,37 @@
 // Notification System for AI Job Assistant
 class NotificationSystem {
   constructor() {
-    this.container = document.getElementById('toastContainer');
+    this.container = document.getElementById("toastContainer");
     if (!this.container) {
-      this.container = document.createElement('div');
-      this.container.id = 'toastContainer';
-      this.container.className = 'toast-container';
+      this.container = document.createElement("div");
+      this.container.id = "toastContainer";
+      this.container.className = "toast-container";
       document.body.appendChild(this.container);
     }
   }
 
-  showToast(message, type = 'info', duration = 4000, title = null) {
-    const toast = document.createElement('div');
+  showToast(message, type = "info", duration = 4000, title = null) {
+    const toast = document.createElement("div");
     toast.className = `toast ${type}`;
-    
+
     const icons = {
-      success: '✅',
-      error: '❌',
-      warning: '⚠️',
-      info: 'ℹ️'
+      success: "✅",
+      error: "❌",
+      warning: "⚠️",
+      info: "ℹ️",
     };
 
     const toastId = Date.now() + Math.random();
     toast.dataset.toastId = toastId;
 
-    const titleElement = title ? `
+    const titleElement = title
+      ? `
       <div class="toast-header">
-        <span>${icons[type] || '📢'}</span>
+        <span>${icons[type] || "📢"}</span>
         <span>${title}</span>
       </div>
-    ` : '';
+    `
+      : "";
 
     toast.innerHTML = `
       ${titleElement}
@@ -41,7 +43,7 @@ class NotificationSystem {
 
     // Trigger animation
     requestAnimationFrame(() => {
-      toast.classList.add('show');
+      toast.classList.add("show");
     });
 
     // Auto remove
@@ -57,7 +59,7 @@ class NotificationSystem {
   closeToast(toastId) {
     const toast = document.querySelector(`[data-toast-id="${toastId}"]`);
     if (toast) {
-      toast.classList.remove('show');
+      toast.classList.remove("show");
       setTimeout(() => {
         if (toast.parentNode) {
           toast.parentNode.removeChild(toast);
@@ -66,53 +68,58 @@ class NotificationSystem {
     }
   }
 
-  success(message, title = 'Success') {
-    return this.showToast(message, 'success', 4000, title);
+  success(message, title = "Success") {
+    return this.showToast(message, "success", 4000, title);
   }
 
-  error(message, title = 'Error') {
-    return this.showToast(message, 'error', 6000, title);
+  error(message, title = "Error") {
+    return this.showToast(message, "error", 6000, title);
   }
 
-  warning(message, title = 'Warning') {
-    return this.showToast(message, 'warning', 5000, title);
+  warning(message, title = "Warning") {
+    return this.showToast(message, "warning", 5000, title);
   }
 
-  info(message, title = 'Info') {
-    return this.showToast(message, 'info', 4000, title);
+  info(message, title = "Info") {
+    return this.showToast(message, "info", 4000, title);
   }
 }
 
 // UI Enhancement utilities
 class UIEnhancements {
-  static showLoadingOverlay(element, message = 'Loading...') {
-    const overlay = document.createElement('div');
-    overlay.className = 'loading-overlay';
+  static showLoadingOverlay(element, message = "Loading...") {
+    const overlay = document.createElement("div");
+    overlay.className = "loading-overlay";
     overlay.innerHTML = `
       <div class="loading-spinner"></div>
       <div style="margin-top: 16px; font-size: 14px; color: var(--gray-600);">${message}</div>
     `;
-    
-    element.style.position = 'relative';
+
+    element.style.position = "relative";
     element.appendChild(overlay);
-    
+
     return overlay;
   }
 
   static hideLoadingOverlay(element) {
-    const overlay = element.querySelector('.loading-overlay');
+    const overlay = element.querySelector(".loading-overlay");
     if (overlay) {
       overlay.remove();
     }
   }
 
   static createModal(title, content, actions = []) {
-    const modalOverlay = document.createElement('div');
-    modalOverlay.className = 'modal-overlay';
-    
-    const actionsHTML = actions.map(action => 
-      `<button class="btn ${action.class || ''}" onclick="${action.onclick}">${action.text}</button>`
-    ).join('');
+    const modalOverlay = document.createElement("div");
+    modalOverlay.className = "modal-overlay";
+
+    const actionsHTML = actions
+      .map(
+        (action) =>
+          `<button class="btn ${action.class || ""}" onclick="${
+            action.onclick
+          }">${action.text}</button>`
+      )
+      .join("");
 
     modalOverlay.innerHTML = `
       <div class="modal">
@@ -121,29 +128,29 @@ class UIEnhancements {
           <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">×</button>
         </div>
         <div class="modal-body">${content}</div>
-        ${actionsHTML ? `<div class="action-buttons">${actionsHTML}</div>` : ''}
+        ${actionsHTML ? `<div class="action-buttons">${actionsHTML}</div>` : ""}
       </div>
     `;
 
     document.body.appendChild(modalOverlay);
-    
+
     requestAnimationFrame(() => {
-      modalOverlay.classList.add('show');
+      modalOverlay.classList.add("show");
     });
 
     return modalOverlay;
   }
 
   static updateProgressBar(element, percentage) {
-    const progressBar = element.querySelector('.progress-fill');
+    const progressBar = element.querySelector(".progress-fill");
     if (progressBar) {
       progressBar.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
     }
   }
 
   static createProgressBar(percentage = 0) {
-    const progressBar = document.createElement('div');
-    progressBar.className = 'progress-bar';
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar";
     progressBar.innerHTML = `<div class="progress-fill" style="width: ${percentage}%"></div>`;
     return progressBar;
   }
@@ -156,10 +163,12 @@ class UIEnhancements {
     const updateCounter = (currentTime) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const current = Math.round(start + (difference * this.easeOutQuart(progress)));
-      
+      const current = Math.round(
+        start + difference * this.easeOutQuart(progress)
+      );
+
       element.textContent = current;
-      
+
       if (progress < 1) {
         requestAnimationFrame(updateCounter);
       }
@@ -173,13 +182,13 @@ class UIEnhancements {
   }
 
   static addRippleEffect(element) {
-    element.addEventListener('click', function(e) {
-      const ripple = document.createElement('span');
+    element.addEventListener("click", function (e) {
+      const ripple = document.createElement("span");
       const rect = this.getBoundingClientRect();
       const size = Math.max(rect.width, rect.height);
       const x = e.clientX - rect.left - size / 2;
       const y = e.clientY - rect.top - size / 2;
-      
+
       ripple.style.cssText = `
         position: absolute;
         border-radius: 50%;
@@ -192,9 +201,9 @@ class UIEnhancements {
         top: ${y}px;
         pointer-events: none;
       `;
-      
+
       this.appendChild(ripple);
-      
+
       setTimeout(() => {
         ripple.remove();
       }, 600);
@@ -202,25 +211,29 @@ class UIEnhancements {
   }
 
   static enableDragAndDrop(element, onDrop, allowedTypes = []) {
-    element.addEventListener('dragover', (e) => {
+    element.addEventListener("dragover", (e) => {
       e.preventDefault();
-      element.classList.add('drag-over');
+      element.classList.add("drag-over");
     });
 
-    element.addEventListener('dragleave', (e) => {
+    element.addEventListener("dragleave", (e) => {
       if (!element.contains(e.relatedTarget)) {
-        element.classList.remove('drag-over');
+        element.classList.remove("drag-over");
       }
     });
 
-    element.addEventListener('drop', (e) => {
+    element.addEventListener("drop", (e) => {
       e.preventDefault();
-      element.classList.remove('drag-over');
-      
+      element.classList.remove("drag-over");
+
       const files = Array.from(e.dataTransfer.files);
-      const validFiles = allowedTypes.length === 0 ? files : 
-        files.filter(file => allowedTypes.some(type => file.type.includes(type)));
-      
+      const validFiles =
+        allowedTypes.length === 0
+          ? files
+          : files.filter((file) =>
+              allowedTypes.some((type) => file.type.includes(type))
+            );
+
       if (validFiles.length > 0) {
         onDrop(validFiles);
       }
@@ -241,20 +254,20 @@ class UIEnhancements {
 
   static throttle(func, limit) {
     let inThrottle;
-    return function() {
+    return function () {
       const args = arguments;
       const context = this;
       if (!inThrottle) {
         func.apply(context, args);
         inThrottle = true;
-        setTimeout(() => inThrottle = false, limit);
+        setTimeout(() => (inThrottle = false), limit);
       }
     };
   }
 }
 
 // Add ripple effect CSS
-const rippleCSS = document.createElement('style');
+const rippleCSS = document.createElement("style");
 rippleCSS.textContent = `
   @keyframes ripple {
     to {
@@ -274,6 +287,6 @@ document.head.appendChild(rippleCSS);
 const notifications = new NotificationSystem();
 
 // Export for use in other scripts
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = { NotificationSystem, UIEnhancements };
 }
