@@ -157,6 +157,7 @@ class DataService {
       autoSave: true,
       notifications: true,
       debugMode: false,
+      compactMode: false,
     };
   }
 

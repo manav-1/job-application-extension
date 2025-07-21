@@ -1,1001 +1,516 @@
-// Enhanced Popup Manager with Better UI and Proper Tab Handling
+// Production-grade Popup Manager with modular architecture
 class PopupManager {
   constructor() {
-    this.userData = null;
-    this.aiConfig = null;
-    this.applications = [];
-    this.currentTab = "profile";
-
-    // Initialize when DOM is ready
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => this.init());
-    } else {
-      this.init();
-    }
+    this.userData = {};
+    this.currentTab = 'profile';
+    this.isCompactMode = false;
+    this.init();
   }
 
   async init() {
     try {
-      console.log("Initializing popup...");
-
-      // Load data first
-      await this.loadAllData();
-
-      // Setup UI
+      console.log('🚀 Initializing AI Job Assistant...');
+      
+      await this.loadUserData();
       this.setupEventListeners();
-      this.setupTabs();
-
-      // Populate forms with loaded data
-      this.populateAllForms();
-
-      // Update AI status
-      this.updateAIStatus();
-
-      console.log("Popup initialized successfully");
+      this.setupTabNavigation();
+      this.populateFields();
+      this.updateUI();
+      
+      console.log('✅ Initialization complete');
     } catch (error) {
-      console.error("Initialization error:", error);
-      this.showMessage("Failed to initialize popup", "error");
+      console.error('❌ Initialization failed:', error);
+      this.showNotification('Failed to initialize application', 'error');
     }
   }
 
-  async loadAllData() {
+  // ==========================================
+  // Data Management
+  // ==========================================
+  
+  async loadUserData() {
     try {
-      console.log("Loading data...");
-
-      // Load all data in parallel
-      const [userDataResponse, aiConfigResponse, applicationsResponse] =
-        await Promise.all([
-          this.sendMessage({ action: "getUserData" }),
-          this.sendMessage({ action: "getAIConfig" }),
-          this.sendMessage({ action: "getApplications" }),
-        ]);
-
-      // Set data with defaults if loading fails
-      this.userData = userDataResponse?.success
-        ? userDataResponse.data
-        : this.getDefaultUserData();
-      this.aiConfig = aiConfigResponse?.success
-        ? aiConfigResponse.data
-        : this.getDefaultAIConfig();
-      this.applications = applicationsResponse?.success
-        ? applicationsResponse.data
-        : [];
-
-      console.log("Data loaded:", {
-        userData: !!this.userData,
-        aiConfig: !!this.aiConfig,
-        appsCount: this.applications.length,
+      const result = await chrome.storage.local.get([
+        'userData',
+        'aiConfig', 
+        'applications',
+        'preferences'
+      ]);
+      
+      this.userData = result.userData || {};
+      this.aiConfig = result.aiConfig || {};
+      this.applications = result.applications || [];
+      this.preferences = result.preferences || { compactMode: false };
+      
+      console.log('📊 Data loaded:', {
+        userData: Object.keys(this.userData).length,
+        applications: this.applications.length
       });
     } catch (error) {
-      console.error("Data loading error:", error);
-      // Set defaults on error
-      this.userData = this.getDefaultUserData();
-      this.aiConfig = this.getDefaultAIConfig();
-      this.applications = [];
+      console.error('Failed to load data:', error);
     }
   }
 
-  getDefaultUserData() {
-    return {
-      personalInfo: {
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        address: "",
-        city: "",
-        state: "",
-        zipCode: "",
-        country: "",
-      },
-      experience: [],
-      education: [],
-      skills: [],
-      preferences: {
-        autoFill: true,
-        saveApplications: true,
-        showNotifications: true,
-      },
-    };
+  async saveUserData() {
+    try {
+      await chrome.storage.local.set({
+        userData: this.userData,
+        aiConfig: this.aiConfig,
+        applications: this.applications,
+        preferences: this.preferences
+      });
+      
+      this.showNotification('Data saved successfully', 'success');
+      console.log('💾 Data saved');
+    } catch (error) {
+      console.error('Failed to save data:', error);
+      this.showNotification('Failed to save data', 'error');
+    }
   }
 
-  getDefaultAIConfig() {
-    return {
-      provider: "openai",
-      apiKey: "",
-      enableCoverLetterGeneration: false,
-      enableInterviewPrep: false,
-      autoGenerateCoverLetters: false,
-    };
-  }
-
+  // ==========================================
+  // Event Listeners
+  // ==========================================
+  
   setupEventListeners() {
-    // Tab switching
-    document.querySelectorAll(".tab-button").forEach((button) => {
-      button.addEventListener("click", (e) => {
-        this.switchTab(e.target.dataset.tab);
+    // Form inputs with auto-save
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+      input.addEventListener('input', (e) => this.handleInputChange(e));
+      input.addEventListener('blur', (e) => this.handleInputChange(e));
+    });
+
+    // Action buttons
+    this.bindButton('fillFormsBtn', () => this.fillCurrentPageForm());
+    this.bindButton('saveDataBtn', () => this.saveUserData());
+
+    // Settings
+    this.bindCheckbox('compactMode', (checked) => this.toggleCompactMode(checked));
+    this.bindCheckbox('autoFill', (checked) => this.toggleAutoFill(checked));
+    this.bindCheckbox('saveLocally', (checked) => this.toggleLocalSave(checked));
+
+    // AI Configuration
+    this.bindSelect('aiProvider', (value) => this.handleAIProviderChange(value));
+    this.bindInput('apiKey', (value) => this.handleAPIKeyChange(value));
+
+    console.log('🎯 Event listeners initialized');
+  }
+
+  setupTabNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const tabId = item.dataset.tab;
+        if (tabId) {
+          this.switchTab(tabId);
+        }
       });
     });
 
-    // Add ripple effects to all buttons
-    if (typeof UIEnhancements !== "undefined") {
-      document.querySelectorAll(".btn").forEach((button) => {
-        UIEnhancements.addRippleEffect(button);
-      });
+    // Sidebar hover effects for tooltips
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+      this.setupSidebarInteractions(sidebar);
     }
+  }
 
-    // Profile form
-    const saveProfileBtn = document.getElementById("saveProfile");
-    if (saveProfileBtn) {
-      saveProfileBtn.addEventListener("click", () => this.saveProfile());
-    }
-
-    const fillFormBtn = document.getElementById("fillForm");
-    if (fillFormBtn) {
-      fillFormBtn.addEventListener("click", () => this.fillForm());
-    }
-
-    // Skills management
-    const addSkillBtn = document.getElementById("addSkill");
-    if (addSkillBtn) {
-      addSkillBtn.addEventListener("click", () => this.addSkill());
-    }
-
-    const skillInput = document.getElementById("skillInput");
-    if (skillInput) {
-      skillInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          this.addSkill();
+  setupSidebarInteractions(sidebar) {
+    let hoverTimeout;
+    
+    sidebar.addEventListener('mouseenter', () => {
+      clearTimeout(hoverTimeout);
+      sidebar.classList.remove('collapsed');
+    });
+    
+    sidebar.addEventListener('mouseleave', () => {
+      hoverTimeout = setTimeout(() => {
+        if (!this.isCompactMode) {
+          sidebar.classList.add('collapsed');
         }
-      });
+      }, 300);
+    });
+  }
+
+  // ==========================================
+  // Tab Management
+  // ==========================================
+  
+  switchTab(tabId) {
+    // Update active nav item
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    document.querySelector(`[data-tab="${tabId}"]`)?.classList.add('active');
+
+    // Update active tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.add('hidden');
+      content.classList.remove('active');
+    });
+    
+    const targetTab = document.getElementById(tabId);
+    if (targetTab) {
+      targetTab.classList.remove('hidden');
+      targetTab.classList.add('active');
     }
 
-    // Experience and Education
-    const addExperienceBtn = document.getElementById("addExperience");
-    if (addExperienceBtn) {
-      addExperienceBtn.addEventListener("click", () => this.addExperience());
-    }
+    this.currentTab = tabId;
+    console.log(`📋 Switched to ${tabId} tab`);
 
-    const addEducationBtn = document.getElementById("addEducation");
-    if (addEducationBtn) {
-      addEducationBtn.addEventListener("click", () => this.addEducation());
-    }
+    // Load tab-specific data
+    this.loadTabData(tabId);
+  }
 
-    // AI Configuration
-    const aiProviderSelect = document.getElementById("aiProvider");
-    if (aiProviderSelect) {
-      aiProviderSelect.addEventListener("change", () =>
-        this.updateAIProviderHelp()
-      );
-    }
-
-    const enableAICheckbox = document.getElementById("enableAI");
-    if (enableAICheckbox) {
-      enableAICheckbox.addEventListener("change", (e) => {
-        this.toggleAIFeatures(e.target.checked);
-        if (e.target.checked) {
-          this.saveAIConfig();
-        }
-      });
-    }
-
-    const apiKeyInput = document.getElementById("apiKey");
-    if (apiKeyInput) {
-      apiKeyInput.addEventListener("input", () => {
+  async loadTabData(tabId) {
+    switch (tabId) {
+      case 'applications':
+        await this.loadApplicationStats();
+        break;
+      case 'settings':
         this.updateAIStatus();
-      });
-    }
-
-    // AI Actions
-    const generateCoverLetterBtn = document.getElementById(
-      "generateCoverLetter"
-    );
-    if (generateCoverLetterBtn) {
-      generateCoverLetterBtn.addEventListener("click", () =>
-        this.generateCoverLetter()
-      );
-    }
-
-    const generateInterviewBtn = document.getElementById(
-      "generateInterviewQuestions"
-    );
-    if (generateInterviewBtn) {
-      generateInterviewBtn.addEventListener("click", () =>
-        this.generateInterviewQuestions()
-      );
-    }
-
-    // Settings
-    const exportDataBtn = document.getElementById("exportData");
-    if (exportDataBtn) {
-      exportDataBtn.addEventListener("click", () => this.exportData());
-    }
-
-    const importDataBtn = document.getElementById("importData");
-    if (importDataBtn) {
-      importDataBtn.addEventListener("click", () => this.importData());
-    }
-
-    const clearDataBtn = document.getElementById("clearData");
-    if (clearDataBtn) {
-      clearDataBtn.addEventListener("click", () => this.clearData());
+        break;
+      default:
+        break;
     }
   }
 
-  setupTabs() {
-    // Ensure the active tab is displayed correctly
-    this.switchTab(this.currentTab);
+  // ==========================================
+  // Form Handling
+  // ==========================================
+  
+  handleInputChange(event) {
+    const { id, value, type, checked } = event.target;
+    
+    if (type === 'checkbox') {
+      this.userData[id] = checked;
+    } else {
+      this.userData[id] = value;
+    }
+
+    // Auto-save after a short delay
+    clearTimeout(this.autoSaveTimeout);
+    this.autoSaveTimeout = setTimeout(() => {
+      this.saveUserData();
+    }, 1000);
   }
 
-  populateAllForms() {
-    console.log("Populating forms...");
-
-    // Populate personal information
-    if (this.userData?.personalInfo) {
-      Object.entries(this.userData.personalInfo).forEach(([key, value]) => {
-        const element = document.getElementById(key);
-        if (element && value) {
+  populateFields() {
+    Object.entries(this.userData).forEach(([key, value]) => {
+      const element = document.getElementById(key);
+      if (element) {
+        if (element.type === 'checkbox') {
+          element.checked = value;
+        } else {
           element.value = value;
         }
-      });
-    }
+      }
+    });
 
-    // Populate skills
-    this.displaySkills();
-
-    // Populate experience
-    this.displayExperience();
-
-    // Populate education
-    this.displayEducation();
-
-    // Populate AI configuration
-    this.populateAIConfig();
-
-    // Populate applications
-    this.displayApplications();
+    console.log('📝 Form fields populated');
   }
 
-  populateAIConfig() {
-    if (!this.aiConfig) return;
-
-    const providerSelect = document.getElementById("aiProvider");
-    const apiKeyInput = document.getElementById("apiKey");
-    const enableAICheckbox = document.getElementById("enableAI");
-    const enableCoverLettersCheckbox =
-      document.getElementById("enableCoverLetters");
-    const enableInterviewPrepCheckbox = document.getElementById(
-      "enableInterviewPrep"
-    );
-
-    if (providerSelect) {
-      providerSelect.value = this.aiConfig.provider || "openai";
+  // ==========================================
+  // AI Integration
+  // ==========================================
+  
+  handleAIProviderChange(provider) {
+    this.aiConfig.provider = provider;
+    this.updateAIStatus();
+    
+    // Show relevant help text
+    const helps = document.querySelectorAll('[id$="Help"]');
+    helps.forEach(help => help.style.display = 'none');
+    
+    if (provider) {
+      const helpElement = document.getElementById(`${provider}Help`);
+      if (helpElement) {
+        helpElement.style.display = 'block';
+      }
     }
+  }
 
-    if (apiKeyInput) {
-      apiKeyInput.value = this.aiConfig.apiKey || "";
-    }
-
-    const hasApiKey = this.aiConfig.apiKey && this.aiConfig.apiKey.length > 0;
-
-    if (enableAICheckbox) {
-      enableAICheckbox.checked = hasApiKey;
-    }
-
-    if (enableCoverLettersCheckbox) {
-      enableCoverLettersCheckbox.checked =
-        this.aiConfig.enableCoverLetterGeneration || false;
-    }
-
-    if (enableInterviewPrepCheckbox) {
-      enableInterviewPrepCheckbox.checked =
-        this.aiConfig.enableInterviewPrep || false;
-    }
-
-    this.toggleAIFeatures(hasApiKey);
-    this.updateAIProviderHelp();
+  handleAPIKeyChange(apiKey) {
+    this.aiConfig.apiKey = apiKey;
     this.updateAIStatus();
   }
 
-  updateAIProviderHelp() {
-    const provider = document.getElementById("aiProvider")?.value;
-    const openaiHelp = document.getElementById("openaiHelp");
-    const geminiHelp = document.getElementById("geminiHelp");
-
-    if (provider === "gemini") {
-      if (openaiHelp) openaiHelp.style.display = "none";
-      if (geminiHelp) geminiHelp.style.display = "inline";
-    } else {
-      if (openaiHelp) openaiHelp.style.display = "inline";
-      if (geminiHelp) geminiHelp.style.display = "none";
-    }
-  }
-
-  toggleAIFeatures(enabled) {
-    const aiFeatures = document.getElementById("aiFeatures");
-    if (aiFeatures) {
-      aiFeatures.style.display = enabled ? "block" : "none";
-    }
-  }
-
   updateAIStatus() {
-    const apiKey = document.getElementById("apiKey")?.value;
-    const provider = document.getElementById("aiProvider")?.value || "openai";
-    const statusElement = document.getElementById("aiStatus");
-
-    if (!statusElement) return;
-
-    const hasApiKey = apiKey && apiKey.length > 0;
-    const statusText = hasApiKey
-      ? `AI Provider: ${provider.toUpperCase()} Connected`
-      : "AI Provider: Not Connected";
-
-    statusElement.className = `ai-status ${
-      hasApiKey ? "connected" : "disconnected"
-    }`;
-    statusElement.innerHTML = `
-      <div class="ai-status-icon"></div>
-      <span>${statusText}</span>
-    `;
-  }
-
-  displaySkills() {
-    const skillsContainer = document.getElementById("skillsContainer");
-    if (!skillsContainer) return;
-
-    skillsContainer.innerHTML = "";
-
-    if (this.userData?.skills && this.userData.skills.length > 0) {
-      this.userData.skills.forEach((skill, index) => {
-        const skillTag = document.createElement("div");
-        skillTag.className = "skill-tag";
-        skillTag.innerHTML = `
-          ${skill}
-          <button class="remove-btn" onclick="popupManager.removeSkill(${index})">×</button>
-        `;
-        skillsContainer.appendChild(skillTag);
-      });
-    }
-  }
-
-  displayExperience() {
-    const experienceList = document.getElementById("experienceList");
-    if (!experienceList) return;
-
-    experienceList.innerHTML = "";
-
-    if (this.userData?.experience && this.userData.experience.length > 0) {
-      this.userData.experience.forEach((exp, index) => {
-        const expElement = document.createElement("div");
-        expElement.className = "experience-item";
-        expElement.innerHTML = `
-          <div class="experience-header">
-            <div>
-              <div class="experience-title">${exp.position || "Position"}</div>
-              <div class="experience-company">${exp.company || "Company"}</div>
-              <div class="experience-date">${exp.startDate || ""} - ${
-          exp.endDate || "Present"
-        }</div>
-            </div>
-          </div>
-          <div style="margin-top: 8px; color: #6b7280; font-size: 13px;">
-            ${exp.description || "No description"}
-          </div>
-          <button class="remove-item-btn" onclick="popupManager.removeExperience(${index})">×</button>
-        `;
-        experienceList.appendChild(expElement);
-      });
-    }
-  }
-
-  displayEducation() {
-    const educationList = document.getElementById("educationList");
-    if (!educationList) return;
-
-    educationList.innerHTML = "";
-
-    if (this.userData?.education && this.userData.education.length > 0) {
-      this.userData.education.forEach((edu, index) => {
-        const eduElement = document.createElement("div");
-        eduElement.className = "education-item";
-        eduElement.innerHTML = `
-          <div class="education-header">
-            <div>
-              <div class="experience-title">${edu.degree || "Degree"}</div>
-              <div class="experience-company">${
-                edu.institution || "Institution"
-              }</div>
-              <div class="experience-date">${edu.graduationDate || ""}</div>
-            </div>
-          </div>
-          <div style="margin-top: 8px; color: #6b7280; font-size: 13px;">
-            GPA: ${edu.gpa || "N/A"}
-          </div>
-          <button class="remove-item-btn" onclick="popupManager.removeEducation(${index})">×</button>
-        `;
-        educationList.appendChild(eduElement);
-      });
-    }
-  }
-
-  displayApplications() {
-    const applicationsList = document.getElementById("applicationsList");
-    const totalAppsElement = document.getElementById("totalApps");
-    const thisWeekElement = document.getElementById("thisWeek");
-
-    if (!applicationsList) return;
-
-    // Update stats
-    const now = new Date();
-    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const thisWeekCount = this.applications.filter(
-      (app) => new Date(app.createdDate || app.appliedDate) >= oneWeekAgo
-    ).length;
-
-    if (totalAppsElement)
-      totalAppsElement.textContent = this.applications.length;
-    if (thisWeekElement) thisWeekElement.textContent = thisWeekCount;
-
-    if (this.applications && this.applications.length > 0) {
-      applicationsList.innerHTML = "";
-
-      this.applications.slice(0, 10).forEach((app) => {
-        const appElement = document.createElement("div");
-        appElement.className = "application-item";
-        appElement.innerHTML = `
-          <div class="application-header">
-            <div>
-              <div class="application-title">${
-                app.title || "Unknown Position"
-              }</div>
-              <div class="application-company">${
-                app.company || "Unknown Company"
-              }</div>
-            </div>
-            <span class="status-badge status-${app.status || "draft"}">${
-          app.status || "draft"
-        }</span>
-          </div>
-          <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">
-            Applied: ${
-              app.appliedDate
-                ? new Date(app.appliedDate).toLocaleDateString()
-                : "Not yet"
-            }
-          </div>
-        `;
-        applicationsList.appendChild(appElement);
-      });
-    } else {
-      applicationsList.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">📄</div>
-          <div>No applications yet</div>
-          <div style="font-size: 12px; margin-top: 8px;">Fill your first job application to get started</div>
-        </div>
-      `;
-    }
-  }
-
-  switchTab(tabName) {
-    console.log("Switching to tab:", tabName);
-    this.currentTab = tabName;
-
-    // Update button states
-    document.querySelectorAll(".tab-button").forEach((button) => {
-      button.classList.toggle("active", button.dataset.tab === tabName);
-    });
-
-    // Update content visibility
-    document.querySelectorAll(".tab-content").forEach((content) => {
-      content.classList.toggle("active", content.id === tabName);
+    const statusElements = document.querySelectorAll('.ai-status');
+    const hasProvider = this.aiConfig.provider;
+    const hasApiKey = this.aiConfig.apiKey && this.aiConfig.apiKey.length > 10;
+    
+    statusElements.forEach(element => {
+      if (hasProvider && hasApiKey) {
+        element.classList.remove('disconnected');
+        element.classList.add('connected');
+        element.textContent = `AI Provider: ${this.aiConfig.provider.toUpperCase()} Connected`;
+      } else {
+        element.classList.remove('connected');
+        element.classList.add('disconnected');
+        element.textContent = 'AI Provider: Not Connected';
+      }
     });
   }
 
-  async saveProfile() {
-    const saveBtn = document.getElementById("saveProfile");
-    let loadingOverlay = null;
-
+  // ==========================================
+  // Form Filling
+  // ==========================================
+  
+  async fillCurrentPageForm() {
     try {
-      // Show loading state
-      if (saveBtn && typeof UIEnhancements !== "undefined") {
-        saveBtn.classList.add("loading");
-        saveBtn.disabled = true;
-        loadingOverlay = UIEnhancements.showLoadingOverlay(
-          saveBtn.closest(".action-buttons"),
-          "Saving profile..."
-        );
+      console.log('🎯 Starting form fill...');
+      
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (!activeTab) {
+        throw new Error('No active tab found');
       }
 
-      // Collect form data
-      const personalInfo = {};
-      const fields = [
-        "firstName",
-        "lastName",
-        "email",
-        "phone",
-        "address",
-        "city",
-        "state",
-        "zipCode",
-        "linkedinUrl",
-        "githubUrl",
-        "portfolioUrl",
-      ];
-
-      fields.forEach((field) => {
-        const element = document.getElementById(field);
-        if (element) {
-          personalInfo[field] = element.value.trim();
-        }
+      // Inject content script and fill forms
+      await chrome.scripting.executeScript({
+        target: { tabId: activeTab.id },
+        function: this.injectFormFiller,
+        args: [this.userData]
       });
 
-      // Update userData
-      this.userData.personalInfo = personalInfo;
-
-      const response = await this.sendMessage({
-        action: "saveUserData",
-        data: this.userData,
-      });
-
-      if (response?.success) {
-        this.showMessage("Profile saved successfully!", "success");
-      } else {
-        throw new Error(response?.error || "Failed to save profile");
-      }
+      this.showNotification('Forms filled successfully!', 'success');
+      
+      // Track application if on a job site
+      this.trackApplicationIfJobSite(activeTab.url);
+      
     } catch (error) {
-      console.error("Save profile error:", error);
-      this.showMessage("Failed to save profile: " + error.message, "error");
-    } finally {
-      // Hide loading state
-      if (saveBtn) {
-        saveBtn.classList.remove("loading");
-        saveBtn.disabled = false;
-      }
-      if (loadingOverlay && typeof UIEnhancements !== "undefined") {
-        UIEnhancements.hideLoadingOverlay(loadingOverlay.parentElement);
-      }
+      console.error('Form filling failed:', error);
+      this.showNotification('Failed to fill forms', 'error');
     }
   }
 
-  async saveAIConfig() {
-    try {
-      const apiKey = document.getElementById("apiKey")?.value?.trim() || "";
-      const provider = document.getElementById("aiProvider")?.value || "openai";
-      const enableCoverLetters =
-        document.getElementById("enableCoverLetters")?.checked || false;
-      const enableInterviewPrep =
-        document.getElementById("enableInterviewPrep")?.checked || false;
-
-      const aiConfig = {
-        provider,
-        apiKey,
-        enableCoverLetterGeneration: enableCoverLetters,
-        enableInterviewPrep: enableInterviewPrep,
-        autoGenerateCoverLetters: false,
-      };
-
-      const response = await this.sendMessage({
-        action: "saveAIConfig",
-        config: aiConfig,
-      });
-
-      if (response?.success) {
-        this.aiConfig = aiConfig;
-        this.updateAIStatus();
-        this.showMessage("AI configuration saved!", "success");
-      } else {
-        throw new Error(response?.error || "Failed to save AI config");
-      }
-    } catch (error) {
-      console.error("Save AI config error:", error);
-      this.showMessage(
-        "Failed to save AI configuration: " + error.message,
-        "error"
-      );
-    }
-  }
-
-  async fillForm() {
-    try {
-      const response = await this.sendMessage({ action: "fillForm" });
-      if (response?.success) {
-        this.showMessage("Form filled successfully!", "success");
-      } else {
-        throw new Error(response?.error || "Failed to fill form");
-      }
-    } catch (error) {
-      console.error("Fill form error:", error);
-      this.showMessage("Failed to fill form: " + error.message, "error");
-    }
-  }
-
-  addSkill() {
-    const skillInput = document.getElementById("skillInput");
-    if (!skillInput) return;
-
-    const skill = skillInput.value.trim();
-    if (skill && skill.length > 0) {
-      if (!this.userData.skills) {
-        this.userData.skills = [];
-      }
-
-      // Check if skill already exists
-      if (!this.userData.skills.includes(skill)) {
-        this.userData.skills.push(skill);
-        skillInput.value = "";
-        this.displaySkills();
-        this.saveProfile(); // Auto-save
-      } else {
-        this.showMessage("Skill already added", "error");
-      }
-    }
-  }
-
-  removeSkill(index) {
-    if (
-      this.userData.skills &&
-      index >= 0 &&
-      index < this.userData.skills.length
-    ) {
-      this.userData.skills.splice(index, 1);
-      this.displaySkills();
-      this.saveProfile(); // Auto-save
-    }
-  }
-
-  addExperience() {
-    // Simple prompt-based addition (could be enhanced with a modal)
-    const position = prompt("Position:");
-    const company = prompt("Company:");
-    const startDate = prompt("Start Date (YYYY-MM):");
-    const endDate = prompt('End Date (YYYY-MM or "Present"):');
-    const description = prompt("Brief Description:");
-
-    if (position && company) {
-      const experience = { position, company, startDate, endDate, description };
-
-      if (!this.userData.experience) {
-        this.userData.experience = [];
-      }
-
-      this.userData.experience.unshift(experience);
-      this.displayExperience();
-      this.saveProfile(); // Auto-save
-    }
-  }
-
-  removeExperience(index) {
-    if (
-      this.userData.experience &&
-      index >= 0 &&
-      index < this.userData.experience.length
-    ) {
-      this.userData.experience.splice(index, 1);
-      this.displayExperience();
-      this.saveProfile(); // Auto-save
-    }
-  }
-
-  addEducation() {
-    const degree = prompt("Degree:");
-    const institution = prompt("Institution:");
-    const graduationDate = prompt("Graduation Date (YYYY):");
-    const gpa = prompt("GPA (optional):");
-
-    if (degree && institution) {
-      const education = { degree, institution, graduationDate, gpa };
-
-      if (!this.userData.education) {
-        this.userData.education = [];
-      }
-
-      this.userData.education.unshift(education);
-      this.displayEducation();
-      this.saveProfile(); // Auto-save
-    }
-  }
-
-  removeEducation(index) {
-    if (
-      this.userData.education &&
-      index >= 0 &&
-      index < this.userData.education.length
-    ) {
-      this.userData.education.splice(index, 1);
-      this.displayEducation();
-      this.saveProfile(); // Auto-save
-    }
-  }
-
-  async generateCoverLetter() {
-    try {
-      await this.saveAIConfig(); // Ensure config is saved
-
-      if (!this.aiConfig.apiKey) {
-        this.showMessage("Please enter your API key first", "error");
-        this.switchTab("ai");
-        return;
-      }
-
-      this.showMessage("Generating cover letter...", "info");
-
-      // Get current tab info for job context
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
-      });
-      const jobInfo = {
-        title: "Software Developer", // This would be extracted from the page
-        company: "Tech Company",
-        url: tab.url,
-        personalizedReason: "I am excited about this opportunity",
-      };
-
-      const response = await this.sendMessage({
-        action: "generateCoverLetter",
-        jobInfo: jobInfo,
-      });
-
-      if (response?.success) {
-        this.showCoverLetterModal(response.data);
-      } else {
-        throw new Error(response?.error || "Failed to generate cover letter");
-      }
-    } catch (error) {
-      console.error("Generate cover letter error:", error);
-      this.showMessage(
-        "Failed to generate cover letter: " + error.message,
-        "error"
-      );
-    }
-  }
-
-  async generateInterviewQuestions() {
-    try {
-      await this.saveAIConfig(); // Ensure config is saved
-
-      if (!this.aiConfig.apiKey) {
-        this.showMessage("Please enter your API key first", "error");
-        this.switchTab("ai");
-        return;
-      }
-
-      this.showMessage("Generating interview questions...", "info");
-
-      const response = await this.sendMessage({
-        action: "generateInterviewQuestions",
-        jobTitle: "Software Developer", // This would be extracted from the page
-      });
-
-      if (response?.success) {
-        this.showInterviewQuestionsModal(response.data);
-      } else {
-        throw new Error(
-          response?.error || "Failed to generate interview questions"
-        );
-      }
-    } catch (error) {
-      console.error("Generate interview questions error:", error);
-      this.showMessage(
-        "Failed to generate interview questions: " + error.message,
-        "error"
-      );
-    }
-  }
-
-  showCoverLetterModal(coverLetter) {
-    this.createModal(
-      "Generated Cover Letter",
-      `
-      <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; font-size: 14px;">
-        ${coverLetter}
-      </div>
-    `
-    );
-  }
-
-  showInterviewQuestionsModal(questions) {
-    const questionsHtml = questions
-      .map(
-        (q, index) => `
-      <div style="margin-bottom: 16px; padding: 12px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #4f46e5;">
-        <strong>Q${index + 1}:</strong> ${q.question}
-        <br><small style="color: #6b7280; margin-top: 4px;">Category: ${
-          q.category
-        }</small>
-      </div>
-    `
-      )
-      .join("");
-
-    this.createModal(
-      "Interview Questions",
-      `
-      <div style="max-height: 400px; overflow-y: auto;">
-        ${questionsHtml}
-      </div>
-    `
-    );
-  }
-
-  createModal(title, content) {
-    // Remove existing modal
-    const existingModal = document.querySelector(".modal-overlay");
-    if (existingModal) {
-      existingModal.remove();
-    }
-
-    const modal = document.createElement("div");
-    modal.className = "modal-overlay";
-    modal.style.cssText = `
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7); z-index: 10000;
-      display: flex; align-items: center; justify-content: center;
-      backdrop-filter: blur(4px);
-    `;
-
-    modal.innerHTML = `
-      <div style="
-        background: white; border-radius: 12px; padding: 24px;
-        max-width: 600px; width: 90%; max-height: 80vh; overflow: hidden;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      ">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #f3f4f6;">
-          <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #1f2937;">${title}</h3>
-          <button onclick="this.parentElement.parentElement.parentElement.remove()" 
-                  style="background: #f3f4f6; border: none; border-radius: 6px; width: 32px; height: 32px; cursor: pointer; font-size: 18px; color: #6b7280; display: flex; align-items: center; justify-content: center;">×</button>
-        </div>
-        ${content}
-      </div>
-    `;
-
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        modal.remove();
-      }
-    });
-
-    document.body.appendChild(modal);
-  }
-
-  async exportData() {
-    try {
-      const response = await this.sendMessage({ action: "exportData" });
-      if (response?.success) {
-        const dataStr = JSON.stringify(response.data, null, 2);
-        const dataBlob = new Blob([dataStr], { type: "application/json" });
-        const url = URL.createObjectURL(dataBlob);
-
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `job-extension-data-${
-          new Date().toISOString().split("T")[0]
-        }.json`;
-        link.click();
-
-        URL.revokeObjectURL(url);
-        this.showMessage("Data exported successfully!", "success");
-      } else {
-        throw new Error(response?.error || "Failed to export data");
-      }
-    } catch (error) {
-      console.error("Export data error:", error);
-      this.showMessage("Failed to export data: " + error.message, "error");
-    }
-  }
-
-  importData() {
-    const input = document.getElementById("importFile");
-    if (!input) return;
-
-    input.onchange = async (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        try {
-          const text = await file.text();
-          const data = JSON.parse(text);
-
-          const response = await this.sendMessage({
-            action: "importData",
-            data: data,
-          });
-
-          if (response?.success) {
-            await this.loadAllData();
-            this.populateAllForms();
-            this.showMessage("Data imported successfully!", "success");
-          } else {
-            throw new Error(response?.error || "Failed to import data");
-          }
-        } catch (error) {
-          console.error("Import data error:", error);
-          this.showMessage("Invalid file format or import failed", "error");
-        }
-      }
+  injectFormFiller(userData) {
+    // This function runs in the page context
+    const fieldsMap = {
+      // Name fields
+      'first-name': userData.firstName,
+      'last-name': userData.lastName,
+      'full-name': `${userData.firstName} ${userData.lastName}`,
+      
+      // Contact fields
+      'email': userData.email,
+      'phone': userData.phone,
+      'location': userData.location,
+      
+      // URLs
+      'linkedin': userData.linkedin,
+      'github': userData.github,
+      'portfolio': userData.website,
+      
+      // Experience
+      'current-role': userData.currentRole,
+      'current-company': userData.currentCompany,
+      'experience': userData.experience,
+      'salary': userData.currentSalary,
+      'skills': userData.skills,
+      'summary': userData.summary
     };
 
-    input.click();
-  }
+    let filledCount = 0;
 
-  async clearData() {
-    if (
-      confirm("Are you sure you want to clear all data? This cannot be undone.")
-    ) {
-      try {
-        await chrome.storage.local.clear();
-        this.userData = this.getDefaultUserData();
-        this.aiConfig = this.getDefaultAIConfig();
-        this.applications = [];
-        this.populateAllForms();
-        this.showMessage("All data cleared successfully!", "success");
-      } catch (error) {
-        console.error("Clear data error:", error);
-        this.showMessage("Failed to clear data: " + error.message, "error");
-      }
-    }
-  }
+    // Find and fill form fields
+    Object.entries(fieldsMap).forEach(([fieldType, value]) => {
+      if (!value) return;
 
-  showMessage(message, type = "info") {
-    // Use the new notification system
-    if (typeof notifications !== "undefined") {
-      switch (type) {
-        case "success":
-          notifications.success(message);
-          break;
-        case "error":
-          notifications.error(message);
-          break;
-        case "warning":
-          notifications.warning(message);
-          break;
-        default:
-          notifications.info(message);
-          break;
-      }
-    } else {
-      // Fallback to console if notifications not available
-      console.log(`[${type.toUpperCase()}] ${message}`);
-    }
-  }
+      const selectors = [
+        `[name*="${fieldType}"]`,
+        `[id*="${fieldType}"]`,
+        `[placeholder*="${fieldType}"]`,
+        `[aria-label*="${fieldType}"]`
+      ];
 
-  async sendMessage(message) {
-    try {
-      return new Promise((resolve) => {
-        chrome.runtime.sendMessage(message, (response) => {
-          if (chrome.runtime.lastError) {
-            console.error("Runtime error:", chrome.runtime.lastError);
-            resolve({
-              success: false,
-              error: chrome.runtime.lastError.message,
-            });
-          } else {
-            resolve(response);
+      selectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+          if (element.type !== 'hidden' && !element.value) {
+            element.value = value;
+            element.dispatchEvent(new Event('input', { bubbles: true }));
+            element.dispatchEvent(new Event('change', { bubbles: true }));
+            filledCount++;
           }
         });
       });
-    } catch (error) {
-      console.error("Send message error:", error);
-      return { success: false, error: error.message };
+    });
+
+    console.log(`Filled ${filledCount} form fields`);
+    return filledCount;
+  }
+
+  // ==========================================
+  // Application Tracking
+  // ==========================================
+  
+  trackApplicationIfJobSite(url) {
+    const jobSites = [
+      'linkedin.com',
+      'indeed.com',
+      'glassdoor.com',
+      'monster.com',
+      'ziprecruiter.com',
+      'dice.com',
+      'stackoverflow.com/jobs'
+    ];
+
+    const isJobSite = jobSites.some(site => url.includes(site));
+    
+    if (isJobSite) {
+      this.addApplication({
+        url,
+        company: 'Unknown',
+        position: 'Unknown',
+        date: new Date().toISOString(),
+        status: 'applied'
+      });
+    }
+  }
+
+  addApplication(application) {
+    this.applications.push({
+      id: Date.now(),
+      ...application
+    });
+    
+    this.saveUserData();
+    this.updateApplicationStats();
+  }
+
+  async loadApplicationStats() {
+    const stats = {
+      total: this.applications.length,
+      pending: this.applications.filter(app => app.status === 'applied').length,
+      interviews: this.applications.filter(app => app.status === 'interview').length,
+      rejected: this.applications.filter(app => app.status === 'rejected').length
+    };
+
+    // Update stat displays
+    this.updateElement('totalApplications', stats.total);
+    this.updateElement('pendingApplications', stats.pending);
+    this.updateElement('interviewApplications', stats.interviews);
+    this.updateElement('rejectedApplications', stats.rejected);
+  }
+
+  updateApplicationStats() {
+    if (this.currentTab === 'applications') {
+      this.loadApplicationStats();
+    }
+  }
+
+  // ==========================================
+  // UI Helpers
+  // ==========================================
+  
+  toggleCompactMode(enabled) {
+    this.isCompactMode = enabled;
+    this.preferences.compactMode = enabled;
+    
+    document.body.classList.toggle('compact-mode', enabled);
+    
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+      sidebar.classList.toggle('collapsed', !enabled);
+    }
+    
+    this.saveUserData();
+  }
+
+  toggleAutoFill(enabled) {
+    this.preferences.autoFill = enabled;
+    this.saveUserData();
+  }
+
+  toggleLocalSave(enabled) {
+    this.preferences.saveLocally = enabled;
+    this.saveUserData();
+  }
+
+  updateUI() {
+    // Apply compact mode if enabled
+    if (this.preferences.compactMode) {
+      this.toggleCompactMode(true);
+    }
+    
+    // Update application stats
+    this.updateApplicationStats();
+  }
+
+  showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} fixed top-4 right-4 z-toast min-w-64`;
+    notification.innerHTML = `
+      <div class="flex items-center gap-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+        </svg>
+        <span>${message}</span>
+      </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
+
+  // ==========================================
+  // Utility Methods
+  // ==========================================
+  
+  bindButton(id, handler) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('click', handler);
+    }
+  }
+
+  bindInput(id, handler) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('input', (e) => handler(e.target.value));
+    }
+  }
+
+  bindSelect(id, handler) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('change', (e) => handler(e.target.value));
+    }
+  }
+
+  bindCheckbox(id, handler) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('change', (e) => handler(e.target.checked));
+    }
+  }
+
+  updateElement(id, value) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = value;
     }
   }
 }
 
-// Add CSS animations
-const style = document.createElement("style");
-style.textContent = `
-  @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-  
-  @keyframes slideOut {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
-  }
-`;
-document.head.appendChild(style);
+// Initialize the popup manager when the DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    window.popupManager = new PopupManager();
+  });
+} else {
+  window.popupManager = new PopupManager();
+}
 
-// Initialize the popup manager when script loads
-const popupManager = new PopupManager();
+// Export for testing
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = PopupManager;
+}

@@ -3,431 +3,583 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles/base.css" />
-    <link rel="stylesheet" href="styles/components.css" />
-    <link rel="stylesheet" href="styles/ui-components.css" />
-    <link rel="stylesheet" href="styles/utilities.css" />
-    <link rel="stylesheet" href="styles/enhancements.css" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <title>Application Assistant</title>
   </head>
   <body>
-    <!-- Toast Notification Container -->
-    <div class="toast-container" id="toastContainer"></div>
+    <!-- Main Application Container -->
+    <div class="extension-layout">
+      <!-- Sidebar Navigation -->
+      <aside class="extension-sidebar nav-sidebar" id="sidebar">
+        <div class="nav-header">
+          <div class="nav-brand">🚀</div>
+        </div>
 
-    <div class="header">
-      <h1>🚀 AI Job Assistant</h1>
-      <div class="subtitle">Smart application filling with AI power</div>
+        <nav class="nav-menu">
+          <button
+            class="nav-item active tooltip"
+            data-tab="profile"
+            data-tooltip="Profile"
+          >
+            <div class="nav-item-icon">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 2H5C3.9 2 3 2.9 3 4V20C3 21.1 3.9 22 5 22H19C20.1 22 21 21.1 21 20V9M12 7C14.21 7 16 8.79 16 11C16 13.21 14.21 15 12 15C9.79 15 8 13.21 8 11C8 8.79 9.79 7 12 7M12 17C15.31 17 18 18.34 18 20H6C6 18.34 8.69 17 12 17Z"
+                />
+              </svg>
+            </div>
+            <span class="nav-item-text">Profile</span>
+          </button>
+
+          <button
+            class="nav-item tooltip"
+            data-tab="experience"
+            data-tooltip="Experience"
+          >
+            <div class="nav-item-icon">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M10,2H14A2,2 0 0,1 16,4V6H20A2,2 0 0,1 22,8V19A2,2 0 0,1 20,21H4A2,2 0 0,1 2,19V8A2,2 0 0,1 4,6H8V4A2,2 0 0,1 10,2M14,6V4H10V6H14Z"
+                />
+              </svg>
+            </div>
+            <span class="nav-item-text">Experience</span>
+          </button>
+
+          <button
+            class="nav-item tooltip"
+            data-tab="applications"
+            data-tooltip="Applications"
+          >
+            <div class="nav-item-icon">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,17H7V15H17V17M17,13H7V11H17V13M17,9H7V7H17V9Z"
+                />
+              </svg>
+            </div>
+            <span class="nav-item-text">Applications</span>
+          </button>
+
+          <button
+            class="nav-item tooltip"
+            data-tab="settings"
+            data-tooltip="Settings"
+          >
+            <div class="nav-item-icon">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
+                />
+              </svg>
+            </div>
+            <span class="nav-item-text">Settings</span>
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="extension-main">
+        <div class="extension-content">
+          <!-- Profile Tab -->
+          <section id="profile" class="tab-content active">
+            <div class="flex flex-col gap-6">
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">Personal Information</h2>
+                  <p class="card-description">Basic details about yourself</p>
+                </div>
+                <div class="card-content">
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                      <label class="form-label" for="firstName"
+                        >First Name</label
+                      >
+                      <input
+                        class="form-input"
+                        type="text"
+                        id="firstName"
+                        placeholder="John"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="lastName">Last Name</label>
+                      <input
+                        class="form-input"
+                        type="text"
+                        id="lastName"
+                        placeholder="Doe"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input
+                      class="form-input"
+                      type="email"
+                      id="email"
+                      placeholder="john.doe@example.com"
+                    />
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                      <label class="form-label" for="phone">Phone Number</label>
+                      <input
+                        class="form-input"
+                        type="tel"
+                        id="phone"
+                        placeholder="+1 (555) 123-4567"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="location">Location</label>
+                      <input
+                        class="form-input"
+                        type="text"
+                        id="location"
+                        placeholder="San Francisco, CA"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="linkedin"
+                      >LinkedIn Profile</label
+                    >
+                    <input
+                      class="form-input"
+                      type="url"
+                      id="linkedin"
+                      placeholder="https://linkedin.com/in/johndoe"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="github"
+                      >GitHub Profile</label
+                    >
+                    <input
+                      class="form-input"
+                      type="url"
+                      id="github"
+                      placeholder="https://github.com/johndoe"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="website"
+                      >Portfolio/Website</label
+                    >
+                    <input
+                      class="form-input"
+                      type="url"
+                      id="website"
+                      placeholder="https://johndoe.dev"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Experience Tab -->
+          <section id="experience" class="tab-content hidden">
+            <div class="flex flex-col gap-6">
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">Work Experience</h2>
+                  <p class="card-description">Your professional background</p>
+                </div>
+                <div class="card-content">
+                  <div class="form-group">
+                    <label class="form-label" for="currentRole"
+                      >Current Role</label
+                    >
+                    <input
+                      class="form-input"
+                      type="text"
+                      id="currentRole"
+                      placeholder="Senior Software Engineer"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="currentCompany"
+                      >Current Company</label
+                    >
+                    <input
+                      class="form-input"
+                      type="text"
+                      id="currentCompany"
+                      placeholder="Tech Corp Inc."
+                    />
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                      <label class="form-label" for="experience"
+                        >Years of Experience</label
+                      >
+                      <select class="form-input form-select" id="experience">
+                        <option value="">Select experience</option>
+                        <option value="0-1">0-1 years</option>
+                        <option value="1-3">1-3 years</option>
+                        <option value="3-5">3-5 years</option>
+                        <option value="5-10">5-10 years</option>
+                        <option value="10+">10+ years</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="currentSalary"
+                        >Current Salary</label
+                      >
+                      <input
+                        class="form-input"
+                        type="text"
+                        id="currentSalary"
+                        placeholder="$120,000"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="skills">Key Skills</label>
+                    <textarea
+                      class="form-input form-textarea"
+                      id="skills"
+                      placeholder="JavaScript, Python, React, Node.js, AWS..."
+                    ></textarea>
+                    <div class="form-help">Separate skills with commas</div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="summary"
+                      >Professional Summary</label
+                    >
+                    <textarea
+                      class="form-input form-textarea"
+                      id="summary"
+                      placeholder="Brief overview of your professional background and key achievements..."
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Applications Tab -->
+          <section id="applications" class="tab-content hidden">
+            <div class="flex flex-col gap-6">
+              <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="card">
+                  <div class="card-content p-4 text-center">
+                    <div
+                      class="text-2xl font-bold text-primary"
+                      id="totalApplications"
+                    >
+                      0
+                    </div>
+                    <div class="text-sm text-secondary">Total Applications</div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-content p-4 text-center">
+                    <div
+                      class="text-2xl font-bold text-warning"
+                      id="pendingApplications"
+                    >
+                      0
+                    </div>
+                    <div class="text-sm text-secondary">Pending</div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-content p-4 text-center">
+                    <div
+                      class="text-2xl font-bold text-success"
+                      id="interviewApplications"
+                    >
+                      0
+                    </div>
+                    <div class="text-sm text-secondary">Interviews</div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-content p-4 text-center">
+                    <div
+                      class="text-2xl font-bold text-danger"
+                      id="rejectedApplications"
+                    >
+                      0
+                    </div>
+                    <div class="text-sm text-secondary">Rejected</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h2 class="card-title">Recent Applications</h2>
+                      <p class="card-description">
+                        Track your job applications
+                      </p>
+                    </div>
+                    <div class="flex gap-2">
+                      <button class="btn btn-primary btn-sm">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                        </svg>
+                        New Application
+                      </button>
+                      <button class="btn btn-secondary btn-sm">Export</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-content">
+                  <div class="space-y-3" id="applicationsList">
+                    <!-- Applications will be dynamically loaded here -->
+                    <div class="alert alert-info">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+                        />
+                      </svg>
+                      <div>
+                        No applications tracked yet. Start by clicking "New
+                        Application" above.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Settings Tab -->
+          <section id="settings" class="tab-content hidden">
+            <div class="flex flex-col gap-6">
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">AI Configuration</h2>
+                  <p class="card-description">Configure your AI assistant</p>
+                </div>
+                <div class="card-content">
+                  <div class="form-group">
+                    <label class="form-label" for="aiProvider"
+                      >AI Provider</label
+                    >
+                    <select class="form-input form-select" id="aiProvider">
+                      <option value="">Select AI provider</option>
+                      <option value="openai">OpenAI (GPT-4)</option>
+                      <option value="gemini">Google Gemini</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="apiKey">API Key</label>
+                    <input
+                      class="form-input"
+                      type="password"
+                      id="apiKey"
+                      placeholder="Enter your API key"
+                    />
+                    <div class="form-help">
+                      Your API key is stored locally and never shared
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="model">Model</label>
+                    <select class="form-input form-select" id="model">
+                      <option value="">Select model</option>
+                      <option value="gpt-4">GPT-4</option>
+                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                      <option value="gemini-pro">Gemini Pro</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">Preferences</h2>
+                  <p class="card-description">Customize your experience</p>
+                </div>
+                <div class="card-content">
+                  <div class="flex items-center justify-between py-3">
+                    <div>
+                      <div class="font-medium text-primary">Compact Mode</div>
+                      <div class="text-sm text-secondary">
+                        Use a more compact interface
+                      </div>
+                    </div>
+                    <label
+                      class="relative inline-flex items-center cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        class="form-checkbox"
+                        id="compactMode"
+                      />
+                    </label>
+                  </div>
+
+                  <div class="divider"></div>
+
+                  <div class="flex items-center justify-between py-3">
+                    <div>
+                      <div class="font-medium text-primary">
+                        Auto-fill Forms
+                      </div>
+                      <div class="text-sm text-secondary">
+                        Automatically detect and fill forms
+                      </div>
+                    </div>
+                    <label
+                      class="relative inline-flex items-center cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        class="form-checkbox"
+                        id="autoFill"
+                        checked
+                      />
+                    </label>
+                  </div>
+
+                  <div class="divider"></div>
+
+                  <div class="flex items-center justify-between py-3">
+                    <div>
+                      <div class="font-medium text-primary">
+                        Save Data Locally
+                      </div>
+                      <div class="text-sm text-secondary">
+                        Keep your data on this device only
+                      </div>
+                    </div>
+                    <label
+                      class="relative inline-flex items-center cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        class="form-checkbox"
+                        id="saveLocally"
+                        checked
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">Actions</h2>
+                </div>
+                <div class="card-content">
+                  <div class="flex flex-col gap-3">
+                    <button class="btn btn-secondary">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M14,12H19.5L14,6.5V12M6,2A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z"
+                        />
+                      </svg>
+                      Export Data
+                    </button>
+                    <button class="btn btn-secondary">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+                        />
+                      </svg>
+                      Import Data
+                    </button>
+                    <button class="btn btn-danger">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
+                        />
+                      </svg>
+                      Clear All Data
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
 
-    <div class="main-content">
-      <div class="tab-navigation">
-        <button class="tab-button active" data-tab="profile">Profile</button>
-        <button class="tab-button" data-tab="experience">Experience</button>
-        <button class="tab-button" data-tab="ai">AI Settings</button>
-        <button class="tab-button" data-tab="applications">Apps</button>
-        <button class="tab-button" data-tab="settings">Settings</button>
-      </div>
-
-      <!-- Profile Tab -->
-      <div id="profile" class="tab-content active">
-        <div class="form-section">
-          <h3>📋 Personal Information</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="firstName">First Name</label>
-              <input type="text" id="firstName" placeholder="John" />
-            </div>
-            <div class="form-group">
-              <label for="lastName">Last Name</label>
-              <input type="text" id="lastName" placeholder="Doe" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="email">Email Address</label>
-              <input type="email" id="email" placeholder="john@example.com" />
-            </div>
-            <div class="form-group">
-              <label for="phone">Phone Number</label>
-              <input type="tel" id="phone" placeholder="+1 (555) 123-4567" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="address">Street Address</label>
-            <input type="text" id="address" placeholder="123 Main Street" />
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="city">City</label>
-              <input type="text" id="city" placeholder="San Francisco" />
-            </div>
-            <div class="form-group">
-              <label for="state">State/Province</label>
-              <input type="text" id="state" placeholder="CA" />
-            </div>
-            <div class="form-group">
-              <label for="zipCode">ZIP Code</label>
-              <input type="text" id="zipCode" placeholder="94105" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="linkedinUrl">LinkedIn Profile</label>
-              <input
-                type="url"
-                id="linkedinUrl"
-                placeholder="https://linkedin.com/in/johndoe"
-              />
-            </div>
-            <div class="form-group">
-              <label for="githubUrl">GitHub Profile</label>
-              <input
-                type="url"
-                id="githubUrl"
-                placeholder="https://github.com/johndoe"
-              />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="portfolioUrl">Portfolio/Website</label>
-              <input
-                type="url"
-                id="portfolioUrl"
-                placeholder="https://johndoe.dev"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>🛠️ Skills & Expertise</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <input
-                type="text"
-                id="skillInput"
-                placeholder="Add a skill and press Enter (e.g., JavaScript, React, Python)"
-              />
-            </div>
-            <button id="addSkill" class="btn btn-secondary btn-sm">
-              ➕ Add Skill
-            </button>
-          </div>
-          <div id="skillsContainer" class="skill-container">
-            <!-- Skills will be added here dynamically -->
-          </div>
-          <div class="help-text">
-            💡 Add relevant skills to improve job matching and form filling
-            accuracy
-          </div>
-        </div>
-
-        <div class="action-buttons">
-          <button id="saveProfile" class="btn">💾 Save Profile</button>
-          <button id="fillForm" class="btn btn-success">
-            ✨ Smart Fill Form
-          </button>
-          <button id="clearProfile" class="btn btn-secondary">🗑️ Clear</button>
-        </div>
-      </div>
-
-      <!-- Experience Tab -->
-      <div id="experience" class="tab-content">
-        <div class="form-section">
-          <h3>💼 Work Experience</h3>
-          <div class="mb-4">
-            <button id="addExperience" class="btn btn-secondary">
-              ➕ Add Work Experience
-            </button>
-          </div>
-          <div id="experienceList">
-            <!-- Experience items will be added here -->
-            <div class="empty-state" id="experienceEmpty">
-              <div class="empty-state-icon">💼</div>
-              <h3>No work experience added</h3>
-              <p>
-                Add your professional experience to improve job applications
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>🎓 Education</h3>
-          <div class="mb-4">
-            <button id="addEducation" class="btn btn-secondary">
-              ➕ Add Education
-            </button>
-          </div>
-          <div id="educationList">
-            <!-- Education items will be added here -->
-            <div class="empty-state" id="educationEmpty">
-              <div class="empty-state-icon">🎓</div>
-              <h3>No education added</h3>
-              <p>Add your educational background for better job matching</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="action-buttons">
-          <button id="saveExperience" class="btn">💾 Save Changes</button>
-          <button id="importResume" class="btn btn-secondary">
-            📄 Import from Resume
-          </button>
-        </div>
-      </div>
-
-      <!-- AI Settings Tab -->
-      <div id="ai" class="tab-content">
-        <div class="ai-provider-section">
-          <h3>🤖 AI Configuration</h3>
-
-          <div id="aiStatus" class="ai-status disconnected">
-            <div class="ai-status-icon"></div>
-            <span>AI Provider: Not Connected</span>
-          </div>
-
-          <div class="form-group">
-            <label for="aiProvider">Choose AI Provider</label>
-            <select id="aiProvider">
-              <option value="">Select AI Provider</option>
-              <option value="openai">🤖 OpenAI (GPT-3.5 Turbo)</option>
-              <option value="gemini">🧠 Google Gemini Pro</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="apiKey">API Key</label>
-            <input
-              type="password"
-              id="apiKey"
-              placeholder="Enter your API key"
-            />
-            <div id="apiHelp" class="help-text">
-              <span id="openaiHelp">
-                🔑 Get your API key from
-                <a href="https://platform.openai.com/api-keys" target="_blank"
-                  >OpenAI Platform</a
-                >
-              </span>
-              <span id="geminiHelp" style="display: none">
-                🔑 Get your API key from
-                <a
-                  href="https://makersuite.google.com/app/apikey"
-                  target="_blank"
-                  >Google AI Studio</a
-                >
-              </span>
-            </div>
-          </div>
-
-          <div class="checkbox-group">
-            <input type="checkbox" id="enableAI" />
-            <label for="enableAI">Enable AI-powered features</label>
-          </div>
-
-          <div id="aiFeatures" style="display: none; margin-left: 20px">
-            <div class="checkbox-group">
-              <input type="checkbox" id="enableCoverLetters" />
-              <label for="enableCoverLetters"
-                >📝 AI Cover Letter Generation</label
-              >
-            </div>
-            <div class="checkbox-group">
-              <input type="checkbox" id="enableInterviewPrep" />
-              <label for="enableInterviewPrep"
-                >❓ Interview Question Generation</label
-              >
-            </div>
-            <div class="checkbox-group">
-              <input type="checkbox" id="enableJobMatching" />
-              <label for="enableJobMatching">🎯 Smart Job Matching</label>
-            </div>
-          </div>
-
-          <div class="action-buttons">
-            <button id="testConnection" class="btn btn-secondary btn-sm">
-              🔗 Test Connection
-            </button>
-            <button id="saveAIConfig" class="btn btn-sm">
-              💾 Save Configuration
-            </button>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>🚀 AI Tools</h3>
-          <div class="action-buttons">
-            <button id="generateCoverLetter" class="btn" disabled>
-              📝 Generate Cover Letter
-            </button>
-            <button id="generateInterviewQuestions" class="btn" disabled>
-              ❓ Interview Prep
-            </button>
-            <button id="optimizeProfile" class="btn" disabled>
-              ⚡ Optimize Profile
-            </button>
-          </div>
-          <div class="help-text">
-            💡 AI tools require a valid API key and enabled AI features
-          </div>
-        </div>
-      </div>
-
-      <!-- Applications Tab -->
-      <div id="applications" class="tab-content">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <span class="stat-number" id="totalApps">0</span>
-            <div class="stat-label">Total Applications</div>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number" id="thisWeek">0</span>
-            <div class="stat-label">This Week</div>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number" id="interviewCount">0</span>
-            <div class="stat-label">Interviews</div>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number" id="responseRate">0%</span>
-            <div class="stat-label">Response Rate</div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="flex justify-between items-center mb-4">
-            <h3>📊 Application Tracker</h3>
-            <div class="action-buttons">
-              <button id="exportApplications" class="btn btn-secondary btn-sm">
-                📤 Export
-              </button>
-              <button id="refreshApplications" class="btn btn-sm">
-                🔄 Refresh
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div id="applicationsList">
-          <div class="empty-state">
-            <div class="empty-state-icon">📄</div>
-            <h3>No applications tracked yet</h3>
-            <p>Start by filling job applications to track your progress</p>
-            <div class="action-buttons mt-4">
-              <button
-                class="btn btn-secondary btn-sm"
-                onclick="document.querySelector('[data-tab=profile]').click()"
-              >
-                ✨ Set Up Profile First
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Settings Tab -->
-      <div id="settings" class="tab-content">
-        <div class="form-section">
-          <h3>💾 Data Management</h3>
-          <div class="action-buttons">
-            <button id="exportData" class="btn btn-secondary">
-              📤 Export All Data
-            </button>
-            <button id="importData" class="btn btn-secondary">
-              📥 Import Data
-            </button>
-          </div>
-          <div class="help-text mt-4">
-            Export your profile, experience, and application data as JSON for
-            backup or transfer to another device.
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>🎨 Appearance</h3>
-          <div class="checkbox-group">
-            <input type="checkbox" id="enableAnimations" checked />
-            <label for="enableAnimations"
-              >Enable animations and transitions</label
-            >
-          </div>
-          <div class="checkbox-group">
-            <input type="checkbox" id="compactMode" />
-            <label for="compactMode">Compact mode (smaller spacing)</label>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>🔔 Notifications</h3>
-          <div class="checkbox-group">
-            <input type="checkbox" id="enableNotifications" />
-            <label for="enableNotifications"
-              >Enable browser notifications</label
-            >
-          </div>
-          <div class="checkbox-group">
-            <input type="checkbox" id="reminderNotifications" />
-            <label for="reminderNotifications"
-              >Application deadline reminders</label
-            >
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>🔐 Privacy & Security</h3>
-          <div class="checkbox-group">
-            <input type="checkbox" id="autoSave" checked />
-            <label for="autoSave">Auto-save form data</label>
-          </div>
-          <div class="checkbox-group">
-            <input type="checkbox" id="encryptData" />
-            <label for="encryptData">Encrypt sensitive data locally</label>
-          </div>
-          <div class="help-text">
-            Your data is stored locally on your device and never sent to third
-            parties without your explicit consent.
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>⚠️ Danger Zone</h3>
-          <div class="action-buttons">
-            <button id="clearApplications" class="btn btn-warning">
-              🗑️ Clear Applications Only
-            </button>
-            <button id="clearData" class="btn btn-danger">
-              💥 Reset Everything
-            </button>
-          </div>
-          <div class="help-text text-error">
-            ⚠️ These actions cannot be undone. Consider exporting your data
-            first.
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>ℹ️ About</h3>
-          <div class="text-sm text-gray-600">
-            <p><strong>AI Job Assistant</strong> - Version 2.0</p>
-            <p>Made with ❤️ to help streamline your job application process</p>
-            <div class="mt-4">
-              <a href="#" class="text-primary">📖 User Guide</a> •
-              <a href="#" class="text-primary">🐛 Report Bug</a> •
-              <a href="#" class="text-primary">💡 Feature Request</a>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Action Buttons -->
+    <div class="fixed bottom-0 right-0 p-4 flex gap-2">
+      <button class="btn btn-primary" id="fillFormsBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H17.5C16.95,22 16,21.55 16,21C16,21.55 15.05,22 14.5,22H12V20H14A1,1 0 0,0 15,19V5A1,1 0 0,0 14,4H12V2H14.5C15.05,2 16,2.45 16,3C16,2.45 16.95,2 17.5,2H20V4H18A1,1 0 0,0 17,5V7M2,7H13V9H4V15H13V17H2V7M20,9H17V15H20V9M8.5,12A0.5,0.5 0 0,0 8,12.5A0.5,0.5 0 0,0 8.5,13A0.5,0.5 0 0,0 9,12.5A0.5,0.5 0 0,0 8.5,12Z"
+          />
+        </svg>
+        Fill Forms
+      </button>
+      <button class="btn btn-secondary" id="saveDataBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"
+          />
+        </svg>
+        Save
+      </button>
     </div>
 
-    <input type="file" id="importFile" accept=".json" style="display: none" />
-    <script src="src/utils/UIEnhancements.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>
