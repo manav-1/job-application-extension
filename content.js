@@ -1,6 +1,9 @@
 // Content script for job application auto-fill
+console.log("🔥 Content script - Job Application Filler starting...");
+
 class JobApplicationFiller {
   constructor() {
+    console.log("🔧 JobApplicationFiller constructor called");
     this.isEnabled = true;
     this.currentField = null;
     this.suggestionPopup = null;
@@ -10,32 +13,204 @@ class JobApplicationFiller {
   }
 
   async init() {
+    console.log(
+      "⚡ JobApplicationFiller init() called, document state:",
+      document.readyState
+    );
     // Wait for DOM to be fully loaded
     if (document.readyState === "loading") {
+      console.log("📋 Document still loading, waiting for DOMContentLoaded...");
       document.addEventListener("DOMContentLoaded", () =>
         this.setupExtension()
       );
     } else {
+      console.log("📋 Document ready, calling setupExtension immediately");
       this.setupExtension();
     }
   }
 
   async setupExtension() {
-    // Get user preferences
-    const response = await this.sendMessage({ action: "getUserData" });
-    if (response.success && response.data.preferences) {
-      this.isEnabled = response.data.preferences.autoFillEnabled;
-      this.showSuggestions = response.data.preferences.showSuggestions;
-      this.saveNewData = response.data.preferences.saveNewData;
+    try {
+      console.log("🚀 Setting up Job Application Filler...");
+
+      // Check if chrome.runtime is available
+      if (typeof chrome === "undefined" || !chrome.runtime) {
+        console.warn(
+          "⚠️ Chrome extension APIs not available - running in limited mode"
+        );
+        // Still set up basic functionality without Chrome APIs
+        this.injectCSS();
+        this.setupFieldMonitoring();
+        return;
+      }
+
+      // Inject CSS for suggestions popup
+      this.injectCSS();
+      console.log("✅ CSS injected");
+
+      // Get user preferences with defaults
+      const response = await this.sendMessage({ action: "getUserData" });
+      console.log("📊 User data response:", response);
+
+      // Handle extension context invalidation
+      if (response.contextInvalidated) {
+        console.warn(
+          "⚠️ Extension context invalidated during setup, running in offline mode"
+        );
+        this.showGlobalContextInvalidatedMessage();
+        this.isEnabled = true;
+        this.showSuggestions = false; // Disable suggestions since we can't communicate with background
+        this.saveNewData = false;
+        this.setupFieldMonitoring();
+        return;
+      }
+
+      if (response.success && response.data.preferences) {
+        this.isEnabled = response.data.preferences.autoFillEnabled !== false; // Default to true
+        this.showSuggestions =
+          response.data.preferences.showSuggestions !== false; // Default to true
+        this.saveNewData = response.data.preferences.saveNewData !== false; // Default to true
+      } else {
+        // Default settings if no preferences exist
+        this.isEnabled = true;
+        this.showSuggestions = true;
+        this.saveNewData = true;
+      }
+
+      console.log("⚙️ Settings:", {
+        enabled: this.isEnabled,
+        showSuggestions: this.showSuggestions,
+        saveNewData: this.saveNewData,
+      });
+
+      if (!this.isEnabled) {
+        console.log("⏸️ Auto-fill is disabled, stopping setup");
+        return;
+      }
+
+      // Set up field monitoring
+      this.setupFieldMonitoring();
+      console.log("👁️ Field monitoring setup complete");
+
+      // Auto-fill known fields
+      this.autoFillKnownFields();
+      console.log("🔧 Auto-fill setup complete");
+    } catch (error) {
+      console.error("❌ Error setting up extension:", error);
+      // Continue with basic functionality even if setup fails
+      this.isEnabled = true;
+      this.showSuggestions = true;
+      this.saveNewData = true;
+      this.setupFieldMonitoring();
     }
+  }
 
-    if (!this.isEnabled) return;
+  injectCSS() {
+    // Only inject once
+    if (document.getElementById("job-filler-styles")) return;
 
-    // Set up field monitoring
-    this.setupFieldMonitoring();
-
-    // Auto-fill known fields
-    this.autoFillKnownFields();
+    const style = document.createElement("style");
+    style.id = "job-filler-styles";
+    style.textContent = `
+      .job-filler-suggestions {
+        position: fixed;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        max-height: 300px;
+        overflow-y: auto;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        min-width: 280px;
+        max-width: 400px;
+      }
+      
+      .job-filler-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e2e8f0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 7px 7px 0 0;
+      }
+      
+      .job-filler-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+      }
+      
+      .job-filler-close:hover {
+        opacity: 1;
+      }
+      
+      .job-filler-suggestions-list {
+        padding: 8px 0;
+      }
+      
+      .job-filler-suggestion-item {
+        padding: 12px 16px;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f5f9;
+        transition: background-color 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      
+      .job-filler-suggestion-item:last-child {
+        border-bottom: none;
+      }
+      
+      .job-filler-suggestion-item:hover {
+        background-color: #f8fafc;
+      }
+      
+      .job-filler-suggestion-label {
+        font-weight: 600;
+        color: #334155;
+        font-size: 13px;
+      }
+      
+      .job-filler-suggestion-value {
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.4;
+        word-break: break-word;
+      }
+      
+      /* Animation */
+      .job-filler-suggestions {
+        animation: slideIn 0.2s ease-out;
+      }
+      
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   setupFieldMonitoring() {
@@ -81,30 +256,187 @@ class JobApplicationFiller {
     if (field.hasAttribute("data-job-filler-processed")) return;
     field.setAttribute("data-job-filler-processed", "true");
 
+    console.log("🎯 Setting up listener for field:", {
+      name: field.name,
+      id: field.id,
+      type: field.type,
+      tag: field.tagName,
+    });
+
     // Focus event - show suggestions
     field.addEventListener("focus", (e) => {
-      this.currentField = e.target;
-      if (this.showSuggestions) {
-        this.showFieldSuggestions(e.target);
+      try {
+        console.log(
+          "🔍 Field focused - showing suggestions:",
+          e.target.id || e.target.name || "unnamed"
+        );
+        console.log("🧭 Current settings:", {
+          isEnabled: this.isEnabled,
+          showSuggestions: this.showSuggestions,
+          saveNewData: this.saveNewData,
+        });
+
+        this.currentField = e.target;
+        if (this.showSuggestions) {
+          console.log("📞 Calling showFieldSuggestions...");
+          this.showFieldSuggestions(e.target).catch((error) => {
+            console.error("❌ Error in showFieldSuggestions:", error);
+          });
+        } else {
+          console.log("⚠️ Suggestions disabled in settings");
+        }
+      } catch (error) {
+        console.error("❌ Error in focus event handler:", error);
       }
     });
 
     // Input event - save new data if enabled
     field.addEventListener("input", (e) => {
-      if (this.saveNewData && e.target.value.trim()) {
-        this.debounce(() => {
-          this.saveFieldValue(e.target);
-        }, 1000);
+      try {
+        if (this.saveNewData && e.target.value.trim()) {
+          this.debounce(() => {
+            this.saveFieldValue(e.target);
+          }, 1000);
+        }
+      } catch (error) {
+        console.error("❌ Error in input event handler:", error);
       }
     });
 
     // Blur event - hide suggestions
     field.addEventListener("blur", (e) => {
-      // Delay hiding to allow clicking on suggestions
-      setTimeout(() => {
-        this.hideSuggestions();
-      }, 200);
+      try {
+        // Delay hiding to allow clicking on suggestions
+        setTimeout(() => {
+          this.hideSuggestions();
+        }, 200);
+      } catch (error) {
+        console.error("❌ Error in blur event handler:", error);
+      }
     });
+  }
+
+  // Show message when extension context is invalidated
+  showContextInvalidatedMessage(field) {
+    // Safety check for field parameter
+    if (!field || typeof field !== "object") {
+      console.warn(
+        "⚠️ Invalid field parameter passed to showContextInvalidatedMessage, using global message instead"
+      );
+      this.showGlobalContextInvalidatedMessage();
+      return;
+    }
+
+    // Remove existing popup
+    this.hideSuggestions();
+
+    const popup = document.createElement("div");
+    popup.style.cssText = `
+      position: fixed !important;
+      background: #fff3cd !important;
+      border: 1px solid #ffeaa7 !important;
+      border-radius: 8px !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25) !important;
+      z-index: 2147483647 !important;
+      max-height: 150px !important;
+      overflow-y: auto !important;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      min-width: 280px !important;
+      max-width: 400px !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    `;
+
+    popup.innerHTML = `
+      <div style="
+        padding: 12px 16px !important;
+        border-bottom: 1px solid #ffeaa7 !important;
+        background: #ffc107 !important;
+        color: #212529 !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        border-radius: 7px 7px 0 0 !important;
+      ">
+        <span>⚠️ Extension Reloaded</span>
+        <button class="extension-reload-close" style="
+          background: none !important;
+          border: none !important;
+          color: #212529 !important;
+          font-size: 18px !important;
+          cursor: pointer !important;
+          padding: 0 !important;
+          width: 20px !important;
+          height: 20px !important;
+        ">&times;</button>
+      </div>
+      <div style="padding: 16px !important; color: #856404 !important; font-size: 13px !important; line-height: 1.4 !important;">
+        <p style="margin: 0 0 8px 0 !important;">
+          The extension was reloaded or updated. Please refresh this page to restore full functionality.
+        </p>
+        <button onclick="window.location.reload()" style="
+          background: #ffc107 !important;
+          border: none !important;
+          color: #212529 !important;
+          padding: 6px 12px !important;
+          border-radius: 4px !important;
+          font-size: 12px !important;
+          cursor: pointer !important;
+          font-weight: 600 !important;
+        ">Refresh Page</button>
+      </div>
+    `;
+
+    // Position popup near the field
+    if (field && typeof field.getBoundingClientRect === "function") {
+      const rect = field.getBoundingClientRect();
+      const popupWidth = 300;
+
+      if (rect.left >= popupWidth + 10) {
+        popup.style.left = `${rect.left - popupWidth - 10}px`;
+      } else {
+        const viewportWidth = window.innerWidth;
+        if (rect.right + popupWidth + 10 <= viewportWidth) {
+          popup.style.left = `${rect.right + 10}px`;
+        } else {
+          popup.style.left = "10px";
+        }
+      }
+
+      popup.style.top = `${rect.top}px`;
+    } else {
+      // Default positioning when field is not available
+      popup.style.left = "20px";
+      popup.style.top = "20px";
+    }
+    popup.className = "job-filler-extension-message";
+
+    document.body.appendChild(popup);
+    this.suggestionPopup = popup;
+
+    // Add close button event listener
+    const closeBtn = popup.querySelector(".extension-reload-close");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        popup.remove();
+        this.suggestionPopup = null;
+      });
+    }
+
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+      if (popup.parentNode) {
+        popup.remove();
+        if (this.suggestionPopup === popup) {
+          this.suggestionPopup = null;
+        }
+      }
+    }, 10000);
+
+    console.log("⚠️ Context invalidated message displayed");
   }
 
   async autoFillKnownFields() {
@@ -126,14 +458,87 @@ class JobApplicationFiller {
   }
 
   async showFieldSuggestions(field) {
-    const fieldInfo = this.getFieldInfo(field);
-    const response = await this.sendMessage({
-      action: "getSuggestions",
-      fieldInfo,
-    });
+    try {
+      // Safety check for field parameter
+      if (!field || typeof field !== "object") {
+        console.warn(
+          "⚠️ Invalid field parameter passed to showFieldSuggestions:",
+          field
+        );
+        return;
+      }
 
-    if (response.success && response.suggestions.length > 0) {
-      this.createSuggestionPopup(field, response.suggestions);
+      console.log("🔍 Showing suggestions for field:", {
+        name: field.name,
+        id: field.id,
+        type: field.type,
+        placeholder: field.placeholder,
+      });
+
+      const fieldInfo = this.getFieldInfo(field);
+      console.log("📋 Field info generated:", fieldInfo);
+
+      const response = await this.sendMessage({
+        action: "getSuggestions",
+        fieldInfo,
+      });
+
+      console.log("📝 Suggestions response:", response);
+
+      // Handle extension context invalidation
+      if (response.contextInvalidated) {
+        console.warn(
+          "⚠️ Extension context invalidated, showing fallback message"
+        );
+        this.showContextInvalidatedMessage(field);
+        return;
+      }
+
+      // Debug: Also check if we have user data (only if first call succeeded)
+      if (response.success) {
+        const userDataResponse = await this.sendMessage({
+          action: "getUserData",
+        });
+        console.log("🔍 Debug - User data check:", userDataResponse);
+      }
+
+      if (
+        response.success &&
+        response.suggestions &&
+        response.suggestions.length > 0
+      ) {
+        this.createSuggestionPopup(field, response.suggestions);
+        console.log(
+          "✅ Created suggestion popup with",
+          response.suggestions.length,
+          "suggestions"
+        );
+      } else {
+        console.log(
+          "⚠️ No suggestions available for this field. Response:",
+          response
+        );
+
+        // For testing, let's create a dummy suggestion
+        const dummySuggestions = [
+          { label: "Test First Name", value: "John" },
+          { label: "Test Email", value: "john.doe@example.com" },
+        ];
+        console.log(
+          "🧪 Creating dummy suggestions for testing:",
+          dummySuggestions
+        );
+        this.createSuggestionPopup(field, dummySuggestions);
+      }
+    } catch (error) {
+      console.error("❌ Error in showFieldSuggestions:", error);
+
+      // Show error suggestions for debugging
+      const errorSuggestions = [
+        { label: "Error occurred", value: error.message },
+        { label: "Debug Test", value: "Debug Value" },
+      ];
+      this.createSuggestionPopup(field, errorSuggestions);
     }
   }
 
@@ -197,57 +602,184 @@ class JobApplicationFiller {
   }
 
   createSuggestionPopup(field, suggestions) {
+    // Safety check for field parameter
+    if (!field || typeof field !== "object") {
+      console.warn(
+        "⚠️ Invalid field parameter passed to createSuggestionPopup:",
+        field
+      );
+      return;
+    }
+
+    // Safety check for suggestions parameter
+    if (!Array.isArray(suggestions) || suggestions.length === 0) {
+      console.warn(
+        "⚠️ Invalid or empty suggestions passed to createSuggestionPopup:",
+        suggestions
+      );
+      return;
+    }
+
+    console.log(
+      "🎨 Creating suggestion popup for field:",
+      field.id || field.name,
+      "with suggestions:",
+      suggestions
+    );
+
     // Remove existing popup
     this.hideSuggestions();
 
     const popup = document.createElement("div");
-    popup.className = "job-filler-suggestions";
-    popup.innerHTML = `
-      <div class="job-filler-header">
-        <span>Suggestions</span>
-        <button class="job-filler-close">&times;</button>
-      </div>
-      <div class="job-filler-suggestions-list">
-        ${suggestions
-          .map(
-            (suggestion, index) => `
-          <div class="job-filler-suggestion-item" data-index="${index}">
-            <span class="job-filler-suggestion-label">${suggestion.label}</span>
-            <span class="job-filler-suggestion-value">${this.truncateText(
-              suggestion.value,
-              50
-            )}</span>
-          </div>
-        `
-          )
-          .join("")}
-      </div>
+    popup.style.cssText = `
+      position: fixed !important;
+      background: white !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 8px !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25) !important;
+      z-index: 2147483647 !important;
+      max-height: 300px !important;
+      overflow-y: auto !important;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      min-width: 280px !important;
+      max-width: 400px !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
     `;
 
-    // Position popup near the field
-    const rect = field.getBoundingClientRect();
-    popup.style.position = "fixed";
-    popup.style.left = `${rect.left}px`;
-    popup.style.top = `${rect.bottom + 5}px`;
-    popup.style.zIndex = "10000";
+    try {
+      popup.innerHTML = `
+        <div style="
+          padding: 12px 16px !important;
+          border-bottom: 1px solid #e2e8f0 !important;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+          color: white !important;
+          font-weight: 600 !important;
+          font-size: 14px !important;
+          display: flex !important;
+          justify-content: space-between !important;
+          align-items: center !important;
+          border-radius: 7px 7px 0 0 !important;
+        ">
+          <span>Suggestions</span>
+          <button class="suggestion-close-btn" style="
+            background: none !important;
+            border: none !important;
+            color: white !important;
+            font-size: 18px !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            width: 20px !important;
+            height: 20px !important;
+          ">&times;</button>
+        </div>
+        <div style="padding: 8px 0 !important;">
+          ${suggestions
+            .map(
+              (suggestion, index) => `
+            <div class="suggestion-item" data-value="${(suggestion.value || "")
+              .toString()
+              .replace(/"/g, "&quot;")}" data-field="${
+                field.id || field.name || "unknown"
+              }" style="
+              padding: 12px 16px !important;
+              cursor: pointer !important;
+              border-bottom: 1px solid #f1f5f9 !important;
+              transition: background-color 0.2s !important;
+              display: flex !important;
+              flex-direction: column !important;
+              gap: 4px !important;
+            " onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
+              <span style="
+                font-weight: 600 !important;
+                color: #334155 !important;
+                font-size: 13px !important;
+              ">${suggestion.label || "No label"}</span>
+              <span style="
+                color: #64748b !important;
+                font-size: 12px !important;
+                line-height: 1.4 !important;
+                word-break: break-word !important;
+              ">${this.truncateText(suggestion.value || "", 50)}</span>
+            </div>
+          `
+            )
+            .join("")}
+        </div>
+      `;
+    } catch (error) {
+      console.error("❌ Error creating popup HTML:", error);
+      popup.innerHTML = `
+        <div style="padding: 16px; color: #dc2626; font-size: 14px;">
+          Error creating suggestions popup
+        </div>
+      `;
+    }
+
+    // Add event listeners instead of inline handlers
+    const closeBtn = popup.querySelector(".suggestion-close-btn");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        popup.remove();
+      });
+    }
+
+    const suggestionItems = popup.querySelectorAll(".suggestion-item");
+    suggestionItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        const value = item.dataset.value;
+        const fieldId = item.dataset.field;
+        this.fillFieldAndClose(fieldId, value, item);
+      });
+    });
+
+    // Position popup near the field - LEFT side positioning
+    if (field && typeof field.getBoundingClientRect === "function") {
+      const rect = field.getBoundingClientRect();
+      const popupWidth = 300;
+
+      // Position on the left side of the field
+      if (rect.left >= popupWidth + 10) {
+        popup.style.left = `${rect.left - popupWidth - 10}px`;
+      } else {
+        // Not enough space on left - position on right
+        const viewportWidth = window.innerWidth;
+        if (rect.right + popupWidth + 10 <= viewportWidth) {
+          popup.style.left = `${rect.right + 10}px`;
+        } else {
+          popup.style.left = "10px";
+        }
+      }
+
+      popup.style.top = `${rect.top}px`;
+    } else {
+      // Default positioning when field is not available
+      popup.style.left = "20px";
+      popup.style.top = "20px";
+    }
+    popup.className = "job-filler-suggestions";
 
     document.body.appendChild(popup);
     this.suggestionPopup = popup;
 
-    // Set up popup event listeners
-    popup.addEventListener("click", (e) => {
-      if (e.target.classList.contains("job-filler-close")) {
-        this.hideSuggestions();
-        return;
-      }
+    // Force styles for better browser compatibility
+    setTimeout(() => {
+      popup.style.setProperty("position", "fixed", "important");
+      popup.style.setProperty("z-index", "2147483647", "important");
+      popup.style.setProperty("display", "block", "important");
+      popup.style.setProperty("visibility", "visible", "important");
+      popup.style.setProperty("opacity", "1", "important");
+    }, 10);
 
-      const suggestionItem = e.target.closest(".job-filler-suggestion-item");
-      if (suggestionItem) {
-        const index = parseInt(suggestionItem.dataset.index);
-        const suggestion = suggestions[index];
-        this.fillField(field, suggestion.value);
-        this.hideSuggestions();
-      }
+    console.log("✅ Suggestion popup created and positioned");
+    console.log("🔍 Popup element:", popup);
+    console.log("🔍 Popup computed styles:", {
+      position: getComputedStyle(popup).position,
+      zIndex: getComputedStyle(popup).zIndex,
+      display: getComputedStyle(popup).display,
+      visibility: getComputedStyle(popup).visibility,
+      opacity: getComputedStyle(popup).opacity,
     });
   }
 
@@ -267,6 +799,18 @@ class JobApplicationFiller {
     nativeInputValueSetter.call(field, value);
 
     field.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  // Helper method for popup clicks
+  fillFieldAndClose(fieldIdentifier, value, element) {
+    const field =
+      document.getElementById(fieldIdentifier) ||
+      document.querySelector(`[name="${fieldIdentifier}"]`);
+    if (field) {
+      this.fillField(field, value);
+      this.hideSuggestions();
+      console.log("✅ Field filled:", fieldIdentifier, "with:", value);
+    }
   }
 
   hideSuggestions() {
@@ -301,8 +845,65 @@ class JobApplicationFiller {
   }
 
   truncateText(text, maxLength) {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + "...";
+    // Handle null, undefined, or non-string values
+    if (text == null) return "";
+    const str = text.toString();
+    if (str.length <= maxLength) return str;
+    return str.substring(0, maxLength) + "...";
+  }
+
+  // Direct test function for debugging
+  async testSuggestionPopup(field) {
+    console.log("🧪 Testing suggestion popup directly...");
+
+    // Create test suggestions
+    const testSuggestions = [
+      { label: "Test First Name", value: "John" },
+      { label: "Test Last Name", value: "Doe" },
+      { label: "Test Email", value: "john.doe@example.com" },
+    ];
+
+    this.createSuggestionPopup(field, testSuggestions);
+    console.log("✅ Test popup created with test suggestions");
+  }
+
+  // Brave-specific test popup
+  testBravePopup(field) {
+    console.log("🦁 Testing Brave-compatible popup...");
+
+    // Remove any existing popup
+    const existing = document.querySelector(".brave-test-popup");
+    if (existing) existing.remove();
+
+    // Create a very simple popup that should work in any browser
+    const popup = document.createElement("div");
+    popup.className = "brave-test-popup";
+    popup.innerHTML = "BRAVE TEST POPUP - WORKING!";
+
+    // Use the most basic styling possible
+    popup.style.position = "fixed";
+    popup.style.top = "50px";
+    popup.style.left = "50px";
+    popup.style.width = "200px";
+    popup.style.height = "100px";
+    popup.style.backgroundColor = "red";
+    popup.style.color = "white";
+    popup.style.zIndex = "999999";
+    popup.style.padding = "20px";
+    popup.style.border = "3px solid black";
+    popup.style.fontSize = "14px";
+    popup.style.fontWeight = "bold";
+
+    document.body.appendChild(popup);
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (popup.parentNode) {
+        popup.parentNode.removeChild(popup);
+      }
+    }, 5000);
+
+    console.log("🦁 Brave test popup created");
   }
 
   debounce(func, delay) {
@@ -310,9 +911,147 @@ class JobApplicationFiller {
     this.debounceTimer = setTimeout(func, delay);
   }
 
+  showGlobalContextInvalidatedMessage() {
+    // Prevent showing multiple messages
+    if (document.getElementById("extension-context-invalidated-popup")) {
+      return;
+    }
+
+    // Create a user-friendly notification popup
+    const popup = document.createElement("div");
+    popup.id = "extension-context-invalidated-popup";
+    popup.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #fff;
+        border: 2px solid #ff6b6b;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 2147483647;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        max-width: 320px;
+        color: #333;
+      ">
+        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+          <div style="
+            width: 20px;
+            height: 20px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            margin-right: 8px;
+          ">!</div>
+          <strong style="color: #ff6b6b;">Extension Reloaded</strong>
+        </div>
+        <p style="margin: 0 0 12px 0; line-height: 1.4;">
+          The Job Application Extension was reloaded. Please refresh this page to restore full functionality.
+        </p>
+        <div style="display: flex; gap: 8px;">
+          <button onclick="window.location.reload()" style="
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+          ">Refresh Page</button>
+          <button onclick="this.closest('div[id=extension-context-invalidated-popup]').remove()" style="
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+          ">Dismiss</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Auto-remove after 30 seconds if user doesn't interact
+    setTimeout(() => {
+      const existingPopup = document.getElementById(
+        "extension-context-invalidated-popup"
+      );
+      if (existingPopup) {
+        existingPopup.remove();
+      }
+    }, 30000);
+  }
+
   sendMessage(message) {
     return new Promise((resolve) => {
-      chrome.runtime.sendMessage(message, resolve);
+      try {
+        // Check if chrome runtime is available
+        if (!chrome || !chrome.runtime) {
+          console.warn(
+            "⚠️ Chrome runtime not available - extension may have been reloaded"
+          );
+          this.showGlobalContextInvalidatedMessage();
+          resolve({ success: false, error: "Chrome runtime not available" });
+          return;
+        }
+
+        // Check if extension context is still valid
+        if (!chrome.runtime.id) {
+          console.warn(
+            "⚠️ Extension context invalidated - extension was reloaded"
+          );
+          this.showGlobalContextInvalidatedMessage();
+          resolve({ success: false, error: "Extension context invalidated" });
+          return;
+        }
+
+        chrome.runtime.sendMessage(message, (response) => {
+          if (chrome.runtime.lastError) {
+            const errorMessage = chrome.runtime.lastError.message;
+
+            // Handle specific extension context errors
+            if (
+              errorMessage.includes("Extension context invalidated") ||
+              errorMessage.includes("message port closed") ||
+              errorMessage.includes("receiving end does not exist")
+            ) {
+              console.warn("⚠️ Extension context lost:", errorMessage);
+              console.info(
+                "💡 Please reload the page to restore extension functionality"
+              );
+              this.showGlobalContextInvalidatedMessage();
+              resolve({
+                success: false,
+                error: "Extension reloaded - please refresh the page",
+                contextInvalidated: true,
+              });
+            } else {
+              console.error("❌ Chrome runtime error:", errorMessage);
+              resolve({
+                success: false,
+                error: errorMessage,
+              });
+            }
+          } else {
+            resolve(
+              response || { success: false, error: "No response received" }
+            );
+          }
+        });
+      } catch (error) {
+        console.error("❌ Error sending message:", error);
+        resolve({ success: false, error: error.message });
+      }
     });
   }
 
@@ -325,9 +1064,66 @@ class JobApplicationFiller {
 }
 
 // Initialize the content script
+console.log("🔧 Content script file loaded - URL:", window.location.href);
+console.log("🌐 Browser info:", {
+  userAgent: navigator.userAgent,
+  isBrave: navigator.brave ? "detected" : "not detected",
+  isChrome: !!window.chrome,
+  vendor: navigator.vendor,
+  chromeRuntimeAvailable: typeof chrome !== "undefined" && !!chrome.runtime,
+});
+
 const jobApplicationFiller = new JobApplicationFiller();
+console.log("🚀 JobApplicationFiller instance created");
+
+// Make it globally accessible for debugging
+window.jobApplicationFiller = jobApplicationFiller;
+
+// Add global method for popup interactions
+window.jobApplicationFiller.fillFieldAndClose = function (
+  fieldIdentifier,
+  value,
+  element
+) {
+  const field =
+    document.getElementById(fieldIdentifier) ||
+    document.querySelector(`[name="${fieldIdentifier}"]`);
+  if (field) {
+    jobApplicationFiller.fillField(field, value);
+    jobApplicationFiller.hideSuggestions();
+    console.log("✅ Field filled:", fieldIdentifier, "with:", value);
+  }
+};
+
+// Add a global test function for debugging - make it available immediately
+window.testAutofill = () => {
+  console.log("🧪 Manual autofill test triggered");
+  console.log("📊 Current state:", {
+    isEnabled: jobApplicationFiller.isEnabled,
+    showSuggestions: jobApplicationFiller.showSuggestions,
+    currentField: jobApplicationFiller.currentField,
+  });
+
+  // Test message sending
+  jobApplicationFiller
+    .sendMessage({ action: "getUserData" })
+    .then((response) => {
+      console.log("📨 Test message response:", response);
+    })
+    .catch((error) => {
+      console.error("❌ Test message error:", error);
+    });
+};
+
+console.log(
+  "✅ Content script ready - Extension loaded and testAutofill() available"
+);
 
 // Clean up when page is unloaded
 window.addEventListener("beforeunload", () => {
   jobApplicationFiller.destroy();
 });
+
+console.log(
+  "✅ Content script initialization complete - type testAutofill() in console to debug"
+);

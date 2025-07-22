@@ -136,9 +136,11 @@ Return as a valid JSON array.`;
   }
 }
 
-// Export for use in other files
+// Make available in service worker context
 if (typeof module !== "undefined" && module.exports) {
   module.exports = OpenAIProvider;
-} else {
+} else if (typeof window !== "undefined") {
   window.OpenAIProvider = OpenAIProvider;
+} else if (typeof globalThis !== "undefined") {
+  globalThis.OpenAIProvider = OpenAIProvider;
 }

@@ -5,9 +5,7 @@ importScripts(
   "src/ai/GeminiProvider.js",
   "src/ai/AIProviderFactory.js",
   "src/services/DataService.js",
-  "src/services/FieldDetectionService.js",
   "src/services/ApplicationService.js",
-  "src/utils/FormFillingUtils.js",
   "src/utils/CommonUtils.js"
 );
 
@@ -93,8 +91,19 @@ class JobApplicationExtensionManager {
           break;
 
         case "getUserData":
-          const userData = await this.dataService.getUserData();
-          sendResponse({ success: true, data: userData });
+          // Get userData from popup's storage format for compatibility
+          const result = await chrome.storage.local.get([
+            "userData",
+            "preferences",
+          ]);
+          const userData = result.userData || {};
+          const preferences = result.preferences || {
+            compactMode: false,
+            autoFillEnabled: true,
+            showSuggestions: true,
+            saveNewData: true,
+          };
+          sendResponse({ success: true, data: { ...userData, preferences } });
           break;
 
         case "saveFieldMappings":
@@ -116,6 +125,13 @@ class JobApplicationExtensionManager {
         case "getAIConfig":
           const aiConfig = await this.dataService.getAIConfig();
           sendResponse({ success: true, data: aiConfig });
+          break;
+
+        case "getSuggestions":
+          console.log("🔍 getSuggestions request received:", request.fieldInfo);
+          const suggestions = await this.getFieldSuggestions(request.fieldInfo);
+          console.log("📝 Generated suggestions:", suggestions);
+          sendResponse({ success: true, suggestions });
           break;
 
         case "generateCoverLetter":
@@ -188,7 +204,16 @@ class JobApplicationExtensionManager {
           break;
 
         default:
-          sendResponse({ success: false, error: "Unknown action" });
+          console.error(
+            "❌ Unknown action received:",
+            request.action,
+            "Full request:",
+            request
+          );
+          sendResponse({
+            success: false,
+            error: `Unknown action: ${request.action}`,
+          });
       }
     } catch (error) {
       console.error("Message handling error:", error);
@@ -319,6 +344,154 @@ class JobApplicationExtensionManager {
     } catch (error) {
       return { success: false, error: error.message };
     }
+  }
+
+  async getFieldSuggestions(fieldInfo) {
+    try {
+      console.log("🔍 Getting field suggestions for:", fieldInfo);
+
+      // Get userData from popup's storage format for compatibility
+      const result = await chrome.storage.local.get(["userData"]);
+      let userData = result.userData || {};
+      console.log("📊 Retrieved userData:", userData);
+
+      // Debug: Check if userData is empty and inject test data
+      if (Object.keys(userData).length === 0) {
+        console.log("⚠️ No user data found, creating test data...");
+        const testUserData = {
+          firstName: "John",
+          lastName: "Doe",
+          email: "john.doe@example.com",
+          phone: "+1-555-123-4567",
+        };
+
+        await chrome.storage.local.set({ userData: testUserData });
+        console.log("✅ Test user data created:", testUserData);
+
+        // Use the test data for suggestions
+        userData = testUserData;
+      }
+
+      // Simple field suggestion logic for service worker context
+      const suggestions = this.getSimpleFieldSuggestions(fieldInfo, userData);
+
+      console.log("✅ Generated suggestions:", suggestions);
+      return suggestions;
+    } catch (error) {
+      console.error("❌ Error getting field suggestions:", error);
+      return [];
+    }
+  }
+
+  // Simple field suggestion logic for service worker context
+  getSimpleFieldSuggestions(fieldInfo, userData) {
+    const suggestions = [];
+
+    // Normalize field identifiers
+    const fieldText = (
+      fieldInfo.fieldName +
+      " " +
+      fieldInfo.fieldId +
+      " " +
+      fieldInfo.placeholder +
+      " " +
+      fieldInfo.label
+    ).toLowerCase();
+
+    // Personal Info suggestions
+    if (userData.personalInfo) {
+      if (fieldText.includes("first") || fieldText.includes("fname")) {
+        suggestions.push({
+          label: "First Name",
+          value: userData.personalInfo.firstName || "",
+          category: "personal",
+        });
+      }
+
+      if (
+        fieldText.includes("last") ||
+        fieldText.includes("lname") ||
+        fieldText.includes("surname")
+      ) {
+        suggestions.push({
+          label: "Last Name",
+          value: userData.personalInfo.lastName || "",
+          category: "personal",
+        });
+      }
+
+      if (fieldText.includes("email") || fieldText.includes("mail")) {
+        suggestions.push({
+          label: "Email",
+          value: userData.personalInfo.email || "",
+          category: "personal",
+        });
+      }
+
+      if (
+        fieldText.includes("phone") ||
+        fieldText.includes("mobile") ||
+        fieldText.includes("tel")
+      ) {
+        suggestions.push({
+          label: "Phone",
+          value: userData.personalInfo.phone || "",
+          category: "personal",
+        });
+      }
+
+      if (fieldText.includes("address") || fieldText.includes("street")) {
+        suggestions.push({
+          label: "Address",
+          value: userData.personalInfo.address || "",
+          category: "personal",
+        });
+      }
+
+      if (fieldText.includes("city")) {
+        suggestions.push({
+          label: "City",
+          value: userData.personalInfo.city || "",
+          category: "personal",
+        });
+      }
+
+      if (fieldText.includes("linkedin")) {
+        suggestions.push({
+          label: "LinkedIn",
+          value: userData.personalInfo.linkedin || "",
+          category: "social",
+        });
+      }
+    }
+
+    // Work Experience suggestions
+    if (userData.workExperience && userData.workExperience.length > 0) {
+      const recentJob = userData.workExperience[0];
+
+      if (fieldText.includes("company") || fieldText.includes("employer")) {
+        suggestions.push({
+          label: "Current/Recent Company",
+          value: recentJob.company || "",
+          category: "experience",
+        });
+      }
+
+      if (
+        fieldText.includes("title") ||
+        fieldText.includes("position") ||
+        fieldText.includes("role")
+      ) {
+        suggestions.push({
+          label: "Current/Recent Position",
+          value: recentJob.title || "",
+          category: "experience",
+        });
+      }
+    }
+
+    // Filter out empty suggestions
+    return suggestions.filter((s) => s.value && s.value.trim());
   }
 
   async generateCoverLetterForJob(jobInfo) {

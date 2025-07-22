@@ -316,6 +316,6 @@ class FormFillingUtils {
 // Export for use in other files
 if (typeof module !== "undefined" && module.exports) {
   module.exports = FormFillingUtils;
-} else {
-  window.FormFillingUtils = FormFillingUtils;
+} else if (typeof globalThis !== "undefined") {
+  globalThis.FormFillingUtils = FormFillingUtils;
 }

@@ -156,6 +156,8 @@ Return as a valid JSON array only, no additional text or markdown formatting.`;
 // Export for use in other files
 if (typeof module !== "undefined" && module.exports) {
   module.exports = GeminiProvider;
-} else {
+} else if (typeof window !== "undefined") {
   window.GeminiProvider = GeminiProvider;
+} else if (typeof globalThis !== "undefined") {
+  globalThis.GeminiProvider = GeminiProvider;
 }

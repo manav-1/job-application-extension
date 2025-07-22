@@ -985,6 +985,52 @@
                       />
                     </label>
                   </div>
+
+                  <div class="divider"></div>
+
+                  <div class="flex items-center justify-between py-3">
+                    <div>
+                      <div class="font-medium text-primary">
+                        Show Field Suggestions
+                      </div>
+                      <div class="text-sm text-secondary">
+                        Display suggestions when clicking form fields
+                      </div>
+                    </div>
+                    <label
+                      class="relative inline-flex items-center cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        class="form-checkbox"
+                        id="showSuggestions"
+                        checked
+                      />
+                    </label>
+                  </div>
+
+                  <div class="divider"></div>
+
+                  <div class="flex items-center justify-between py-3">
+                    <div>
+                      <div class="font-medium text-primary">
+                        Save New Field Data
+                      </div>
+                      <div class="text-sm text-secondary">
+                        Automatically save data entered in new fields
+                      </div>
+                    </div>
+                    <label
+                      class="relative inline-flex items-center cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        class="form-checkbox"
+                        id="saveNewData"
+                        checked
+                      />
+                    </label>
+                  </div>
                 </div>
               </div>
 
@@ -994,7 +1040,7 @@
                 </div>
                 <div class="card-content">
                   <div class="flex flex-col gap-3">
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" id="exportDataBtn">
                       <svg
                         width="16"
                         height="16"
@@ -1007,7 +1053,7 @@
                       </svg>
                       Export Data
                     </button>
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" id="importDataBtn">
                       <svg
                         width="16"
                         height="16"
@@ -1020,7 +1066,7 @@
                       </svg>
                       Import Data
                     </button>
-                    <button class="btn btn-danger">
+                    <button class="btn btn-danger" id="clearDataBtn">
                       <svg
                         width="16"
                         height="16"
@@ -1062,10 +1108,13 @@
       </button>
     </div>
 
-    <script src="popup.js"></script>
+    <!-- Load AI dependencies first -->
     <script src="src/ai/AIProvider.js"></script>
     <script src="src/ai/OpenAIProvider.js"></script>
     <script src="src/ai/GeminiProvider.js"></script>
     <script src="src/ai/AIProviderFactory.js"></script>
+
+    <!-- Load main popup script last -->
+    <script src="popup.js"></script>
   </body>
 </html>

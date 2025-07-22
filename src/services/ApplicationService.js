@@ -15,7 +15,7 @@ class ApplicationService {
       id: this.generateApplicationId(),
       title: jobInfo.title || "Unknown Position",
       company: jobInfo.company || "Unknown Company",
-      url: url || window.location.href,
+      url: url || (typeof window !== "undefined" ? window.location.href : ""),
       status: "draft",
       appliedDate: null,
       createdDate: new Date().toISOString(),
@@ -284,5 +284,10 @@ class ApplicationService {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = ApplicationService;
 } else {
-  window.ApplicationService = ApplicationService;
+  // Make available in service worker context
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = ApplicationService;
+  } else if (typeof globalThis !== "undefined") {
+    globalThis.ApplicationService = ApplicationService;
+  }
 }

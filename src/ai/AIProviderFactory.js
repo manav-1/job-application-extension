@@ -29,6 +29,8 @@ class AIProviderFactory {
 // Export for use in other files
 if (typeof module !== "undefined" && module.exports) {
   module.exports = AIProviderFactory;
-} else {
+} else if (typeof window !== "undefined") {
   window.AIProviderFactory = AIProviderFactory;
+} else if (typeof globalThis !== "undefined") {
+  globalThis.AIProviderFactory = AIProviderFactory;
 }

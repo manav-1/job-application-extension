@@ -270,7 +270,10 @@ class StorageUtils {
 class UrlUtils {
   static getCurrentDomain() {
     try {
-      return new URL(window.location.href).hostname;
+      if (typeof window !== "undefined" && window.location) {
+        return new URL(window.location.href).hostname;
+      }
+      return "unknown";
     } catch {
       return "unknown";
     }
@@ -345,10 +348,10 @@ if (typeof module !== "undefined" && module.exports) {
     StorageUtils,
     UrlUtils,
   };
-} else {
-  window.NotificationUtils = NotificationUtils;
-  window.DateUtils = DateUtils;
-  window.ValidationUtils = ValidationUtils;
-  window.StorageUtils = StorageUtils;
-  window.UrlUtils = UrlUtils;
+} else if (typeof globalThis !== "undefined") {
+  globalThis.NotificationUtils = NotificationUtils;
+  globalThis.DateUtils = DateUtils;
+  globalThis.ValidationUtils = ValidationUtils;
+  globalThis.StorageUtils = StorageUtils;
+  globalThis.UrlUtils = UrlUtils;
 }

@@ -217,5 +217,10 @@ class DataService {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = DataService;
 } else {
-  window.DataService = DataService;
+  // Make available in service worker context
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = DataService;
+  } else if (typeof globalThis !== "undefined") {
+    globalThis.DataService = DataService;
+  }
 }

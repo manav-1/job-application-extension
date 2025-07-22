@@ -20,6 +20,8 @@ class AIProvider {
 // Export for use in other files
 if (typeof module !== "undefined" && module.exports) {
   module.exports = AIProvider;
-} else {
+} else if (typeof window !== "undefined") {
   window.AIProvider = AIProvider;
+} else if (typeof globalThis !== "undefined") {
+  globalThis.AIProvider = AIProvider;
 }

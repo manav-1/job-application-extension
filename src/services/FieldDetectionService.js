@@ -235,11 +235,230 @@ class FieldDetectionService {
       fieldCount: form.querySelectorAll("input, textarea, select").length,
     };
   }
+
+  // Get suggestions for a specific field based on field info and user data
+  getSuggestionsForField(fieldInfo, userData) {
+    const suggestions = [];
+
+    // Detect field type based on field info
+    const fieldType = this.detectFieldType(fieldInfo);
+
+    if (!fieldType || !userData) {
+      return suggestions;
+    }
+
+    // Get relevant data from userData based on field type
+    switch (fieldType) {
+      case "firstName":
+        if (userData.firstName)
+          suggestions.push({ label: "First Name", value: userData.firstName });
+        break;
+      case "lastName":
+        if (userData.lastName)
+          suggestions.push({ label: "Last Name", value: userData.lastName });
+        break;
+      case "fullName":
+        if (userData.firstName && userData.lastName) {
+          suggestions.push({
+            label: "Full Name",
+            value: `${userData.firstName} ${userData.lastName}`,
+          });
+        }
+        break;
+      case "email":
+        if (userData.email)
+          suggestions.push({ label: "Email", value: userData.email });
+        break;
+      case "phone":
+        if (userData.phone)
+          suggestions.push({ label: "Phone", value: userData.phone });
+        break;
+      case "address":
+        if (userData.address)
+          suggestions.push({ label: "Address", value: userData.address });
+        break;
+      case "city":
+        if (userData.city)
+          suggestions.push({ label: "City", value: userData.city });
+        break;
+      case "state":
+        if (userData.state)
+          suggestions.push({ label: "State", value: userData.state });
+        break;
+      case "zipCode":
+        if (userData.zipCode)
+          suggestions.push({ label: "Zip Code", value: userData.zipCode });
+        break;
+      case "country":
+        if (userData.country)
+          suggestions.push({ label: "Country", value: userData.country });
+        break;
+      case "linkedin":
+        if (userData.linkedin)
+          suggestions.push({ label: "LinkedIn", value: userData.linkedin });
+        break;
+      case "github":
+        if (userData.github)
+          suggestions.push({ label: "GitHub", value: userData.github });
+        break;
+      case "website":
+        if (userData.website)
+          suggestions.push({ label: "Website", value: userData.website });
+        break;
+      case "coverLetter":
+        if (userData.coverLetter)
+          suggestions.push({
+            label: "Cover Letter",
+            value: userData.coverLetter,
+          });
+        break;
+      case "summary":
+        if (userData.summary)
+          suggestions.push({
+            label: "Professional Summary",
+            value: userData.summary,
+          });
+        break;
+      case "experience":
+        if (
+          userData.experienceHistory &&
+          userData.experienceHistory.length > 0
+        ) {
+          userData.experienceHistory.forEach((exp, index) => {
+            if (exp.description) {
+              suggestions.push({
+                label: `Experience ${index + 1} - ${exp.title || "Position"}`,
+                value: exp.description,
+              });
+            }
+          });
+        }
+        break;
+      case "skills":
+        if (userData.skills)
+          suggestions.push({ label: "Skills", value: userData.skills });
+        break;
+      case "education":
+        if (userData.educationHistory && userData.educationHistory.length > 0) {
+          userData.educationHistory.forEach((edu, index) => {
+            if (edu.degree && edu.institution) {
+              suggestions.push({
+                label: `Education ${index + 1}`,
+                value: `${edu.degree} - ${edu.institution}`,
+              });
+            }
+          });
+        }
+        if (userData.highestDegree)
+          suggestions.push({ label: "Degree", value: userData.highestDegree });
+        if (userData.institution)
+          suggestions.push({
+            label: "Institution",
+            value: userData.institution,
+          });
+        break;
+      default:
+        // For unrecognized fields, try to suggest based on similar field names
+        this.addGenericSuggestions(fieldInfo, userData, suggestions);
+    }
+
+    return suggestions;
+  }
+
+  // Detect field type based on field information
+  detectFieldType(fieldInfo) {
+    const text = (
+      fieldInfo.fieldName +
+      " " +
+      fieldInfo.fieldId +
+      " " +
+      fieldInfo.placeholder +
+      " " +
+      fieldInfo.label
+    ).toLowerCase();
+
+    // Name fields
+    if (text.includes("first") && text.includes("name")) return "firstName";
+    if (text.includes("last") && text.includes("name")) return "lastName";
+    if (text.includes("full") && text.includes("name")) return "fullName";
+    if (
+      text.includes("name") &&
+      !text.includes("company") &&
+      !text.includes("file")
+    )
+      return "fullName";
+
+    // Contact fields
+    if (text.includes("email")) return "email";
+    if (text.includes("phone") || text.includes("tel")) return "phone";
+
+    // Address fields
+    if (text.includes("address") && !text.includes("email")) return "address";
+    if (text.includes("city")) return "city";
+    if (text.includes("state") || text.includes("province")) return "state";
+    if (text.includes("zip") || text.includes("postal")) return "zipCode";
+    if (text.includes("country")) return "country";
+
+    // Social/Web fields
+    if (text.includes("linkedin")) return "linkedin";
+    if (text.includes("github")) return "github";
+    if (text.includes("website") || text.includes("portfolio"))
+      return "website";
+
+    // Professional fields
+    if (text.includes("cover") && text.includes("letter")) return "coverLetter";
+    if (text.includes("summary") || text.includes("about")) return "summary";
+    if (
+      text.includes("experience") ||
+      text.includes("work") ||
+      text.includes("job")
+    )
+      return "experience";
+    if (text.includes("skill")) return "skills";
+    if (
+      text.includes("education") ||
+      text.includes("degree") ||
+      text.includes("university") ||
+      text.includes("college")
+    )
+      return "education";
+
+    return null;
+  }
+
+  // Add generic suggestions for unrecognized fields
+  addGenericSuggestions(fieldInfo, userData, suggestions) {
+    const text = (
+      fieldInfo.fieldName +
+      " " +
+      fieldInfo.fieldId +
+      " " +
+      fieldInfo.placeholder +
+      " " +
+      fieldInfo.label
+    ).toLowerCase();
+
+    // Try to match any user data that might be relevant
+    Object.keys(userData).forEach((key) => {
+      if (
+        userData[key] &&
+        typeof userData[key] === "string" &&
+        userData[key].trim()
+      ) {
+        if (text.includes(key.toLowerCase())) {
+          suggestions.push({
+            label: key.charAt(0).toUpperCase() + key.slice(1),
+            value: userData[key],
+          });
+        }
+      }
+    });
+  }
 }
 
-// Export for use in other files
+// Make available in content script context
 if (typeof module !== "undefined" && module.exports) {
   module.exports = FieldDetectionService;
-} else {
-  window.FieldDetectionService = FieldDetectionService;
+} else if (typeof globalThis !== "undefined") {
+  globalThis.FieldDetectionService = FieldDetectionService;
 }

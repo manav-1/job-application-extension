@@ -41,7 +41,12 @@ class PopupManager {
       this.userData = result.userData || {};
       this.aiConfig = result.aiConfig || {};
       this.applications = result.applications || [];
-      this.preferences = result.preferences || { compactMode: false };
+      this.preferences = result.preferences || {
+        compactMode: false,
+        autoFillEnabled: true,
+        showSuggestions: true,
+        saveNewData: true,
+      };
 
       // Sync the compact mode state
       this.isCompactMode = this.preferences.compactMode;
@@ -97,6 +102,12 @@ class PopupManager {
       this.toggleCompactMode(checked)
     );
     this.bindCheckbox("autoFill", (checked) => this.toggleAutoFill(checked));
+    this.bindCheckbox("showSuggestions", (checked) =>
+      this.toggleShowSuggestions(checked)
+    );
+    this.bindCheckbox("saveNewData", (checked) =>
+      this.toggleSaveNewData(checked)
+    );
     this.bindCheckbox("saveLocally", (checked) =>
       this.toggleLocalSave(checked)
     );
@@ -120,6 +131,11 @@ class PopupManager {
 
     // Education Management
     this.bindButton("addEducationBtn", () => this.addEducationEntry());
+
+    // Data Management
+    this.bindButton("exportDataBtn", () => this.exportData());
+    this.bindButton("importDataBtn", () => this.importData());
+    this.bindButton("clearDataBtn", () => this.clearAllData());
 
     console.log("🎯 Event listeners initialized");
   }
@@ -846,7 +862,72 @@ class PopupManager {
       // Inject content script and fill forms
       await chrome.scripting.executeScript({
         target: { tabId: activeTab.id },
-        function: this.injectFormFiller,
+        func: function (userData) {
+          // This function runs in the page context
+          const fieldsMap = {
+            // Name fields
+            firstName: userData.firstName || "",
+            lastName: userData.lastName || "",
+            fullName: `${userData.firstName || ""} ${
+              userData.lastName || ""
+            }`.trim(),
+
+            // Contact fields
+            email: userData.email || "",
+            phone: userData.phone || "",
+            location: userData.location || "",
+
+            // URLs
+            linkedin: userData.linkedin || "",
+            github: userData.github || "",
+            portfolio: userData.website || "",
+
+            // Experience
+            currentRole: userData.currentRole || "",
+            currentCompany: userData.currentCompany || "",
+            experience: userData.experience || "",
+            salary: userData.currentSalary || "",
+            skills: userData.skills || "",
+            summary: userData.summary || "",
+          };
+
+          let filledCount = 0;
+
+          // Find and fill form fields
+          Object.entries(fieldsMap).forEach(([fieldType, value]) => {
+            if (!value || value.trim() === "") return;
+
+            const selectors = [
+              `[name*="${fieldType}"]`,
+              `[id*="${fieldType}"]`,
+              `[placeholder*="${fieldType}"]`,
+              `[aria-label*="${fieldType}"]`,
+            ];
+
+            selectors.forEach((selector) => {
+              try {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach((element) => {
+                  if (element.type !== "hidden" && !element.value) {
+                    element.value = value;
+                    element.dispatchEvent(
+                      new Event("input", { bubbles: true })
+                    );
+                    element.dispatchEvent(
+                      new Event("change", { bubbles: true })
+                    );
+                    filledCount++;
+                  }
+                });
+              } catch (error) {
+                console.error("Error filling field:", fieldType, error);
+              }
+            });
+          });
+
+          console.log(`Filled ${filledCount} form fields`);
+          return filledCount;
+        },
         args: [this.userData],
       });
 
@@ -858,63 +939,6 @@ class PopupManager {
       console.error("Form filling failed:", error);
       this.showNotification("Failed to fill forms", "error");
     }
-  }
-
-  injectFormFiller(userData) {
-    // This function runs in the page context
-    const fieldsMap = {
-      // Name fields
-      "first-name": userData.firstName,
-      "last-name": userData.lastName,
-      "full-name": `${userData.firstName} ${userData.lastName}`,
-
-      // Contact fields
-      email: userData.email,
-      phone: userData.phone,
-      location: userData.location,
-
-      // URLs
-      linkedin: userData.linkedin,
-      github: userData.github,
-      portfolio: userData.website,
-
-      // Experience
-      "current-role": userData.currentRole,
-      "current-company": userData.currentCompany,
-      experience: userData.experience,
-      salary: userData.currentSalary,
-      skills: userData.skills,
-      summary: userData.summary,
-    };
-
-    let filledCount = 0;
-
-    // Find and fill form fields
-    Object.entries(fieldsMap).forEach(([fieldType, value]) => {
-      if (!value) return;
-
-      const selectors = [
-        `[name*="${fieldType}"]`,
-        `[id*="${fieldType}"]`,
-        `[placeholder*="${fieldType}"]`,
-        `[aria-label*="${fieldType}"]`,
-      ];
-
-      selectors.forEach((selector) => {
-        const elements = document.querySelectorAll(selector);
-        elements.forEach((element) => {
-          if (element.type !== "hidden" && !element.value) {
-            element.value = value;
-            element.dispatchEvent(new Event("input", { bubbles: true }));
-            element.dispatchEvent(new Event("change", { bubbles: true }));
-            filledCount++;
-          }
-        });
-      });
-    });
-
-    console.log(`Filled ${filledCount} form fields`);
-    return filledCount;
   }
 
   // ==========================================
@@ -1262,6 +1286,187 @@ class PopupManager {
   }
 
   // ==========================================
+  // Data Management
+  // ==========================================
+
+  async exportData() {
+    try {
+      console.log("📤 Exporting all data...");
+
+      const allData = {
+        userData: this.userData,
+        aiConfig: this.aiConfig,
+        applications: this.applications,
+        preferences: this.preferences,
+        exportDate: new Date().toISOString(),
+        version: "2.0.0",
+      };
+
+      const dataStr = JSON.stringify(allData, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `job-application-data-${
+        new Date().toISOString().split("T")[0]
+      }.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      this.showNotification("Data exported successfully!", "success");
+      console.log("✅ Data export complete");
+    } catch (error) {
+      console.error("❌ Export failed:", error);
+      this.showNotification("Failed to export data", "error");
+    }
+  }
+
+  async importData() {
+    try {
+      console.log("📥 Starting data import...");
+
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+
+      input.onchange = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        try {
+          const text = await file.text();
+          const importedData = JSON.parse(text);
+
+          // Validate imported data structure
+          if (
+            !importedData.userData &&
+            !importedData.applications &&
+            !importedData.preferences
+          ) {
+            throw new Error("Invalid data format");
+          }
+
+          // Show confirmation dialog
+          const confirmImport = confirm(
+            "This will replace all your current data. Are you sure you want to continue?\n\n" +
+              "Current data will be lost permanently!"
+          );
+
+          if (!confirmImport) {
+            this.showNotification("Import cancelled", "info");
+            return;
+          }
+
+          // Update data
+          this.userData = importedData.userData || {};
+          this.aiConfig = importedData.aiConfig || {};
+          this.applications = importedData.applications || [];
+          this.preferences = importedData.preferences || {
+            compactMode: false,
+            autoFillEnabled: true,
+            showSuggestions: true,
+            saveNewData: true,
+          };
+
+          // Save to storage
+          await this.saveUserData();
+
+          // Refresh UI
+          this.populateFields();
+          this.updateUI();
+
+          this.showNotification("Data imported successfully!", "success");
+          console.log("✅ Data import complete");
+        } catch (error) {
+          console.error("❌ Import failed:", error);
+          this.showNotification(
+            "Failed to import data. Please check the file format.",
+            "error"
+          );
+        }
+      };
+
+      input.click();
+    } catch (error) {
+      console.error("❌ Import setup failed:", error);
+      this.showNotification("Failed to set up import", "error");
+    }
+  }
+
+  async clearAllData() {
+    try {
+      console.log("🗑️ Starting data clear...");
+
+      // Show confirmation dialog
+      const confirmClear = confirm(
+        "This will permanently delete ALL your data including:\n\n" +
+          "• Personal information\n" +
+          "• Work experience\n" +
+          "• Education history\n" +
+          "• Applications tracking\n" +
+          "• AI configuration\n" +
+          "• Preferences\n\n" +
+          "This action cannot be undone. Are you sure?"
+      );
+
+      if (!confirmClear) {
+        this.showNotification("Clear cancelled", "info");
+        return;
+      }
+
+      // Double confirmation for safety
+      const doubleConfirm = confirm(
+        "FINAL WARNING: This will delete everything!\n\n" +
+          "Type 'DELETE' in the next prompt if you're absolutely sure."
+      );
+
+      if (!doubleConfirm) {
+        this.showNotification("Clear cancelled", "info");
+        return;
+      }
+
+      const userInput = prompt("Type 'DELETE' to confirm (case sensitive):");
+      if (userInput !== "DELETE") {
+        this.showNotification(
+          "Clear cancelled - incorrect confirmation",
+          "info"
+        );
+        return;
+      }
+
+      // Clear all data
+      this.userData = {};
+      this.aiConfig = {};
+      this.applications = [];
+      this.preferences = {
+        compactMode: false,
+        autoFillEnabled: true,
+        showSuggestions: true,
+        saveNewData: true,
+      };
+
+      // Clear storage
+      await chrome.storage.local.clear();
+
+      // Save empty data structure
+      await this.saveUserData();
+
+      // Refresh UI
+      this.populateFields();
+      this.updateUI();
+
+      this.showNotification("All data cleared successfully", "success");
+      console.log("✅ All data cleared");
+    } catch (error) {
+      console.error("❌ Clear failed:", error);
+      this.showNotification("Failed to clear data", "error");
+    }
+  }
+
+  // ==========================================
   // UI Helpers
   // ==========================================
 
@@ -1297,8 +1502,21 @@ class PopupManager {
   }
 
   toggleAutoFill(enabled) {
-    this.preferences.autoFill = enabled;
+    this.preferences.autoFillEnabled = enabled;
     this.saveUserData();
+    console.log(`🔄 Auto-fill ${enabled ? "enabled" : "disabled"}`);
+  }
+
+  toggleShowSuggestions(enabled) {
+    this.preferences.showSuggestions = enabled;
+    this.saveUserData();
+    console.log(`🔄 Field suggestions ${enabled ? "enabled" : "disabled"}`);
+  }
+
+  toggleSaveNewData(enabled) {
+    this.preferences.saveNewData = enabled;
+    this.saveUserData();
+    console.log(`🔄 Save new data ${enabled ? "enabled" : "disabled"}`);
   }
 
   toggleLocalSave(enabled) {
