@@ -1,43 +1,30 @@
 // Content script for job application auto-fill
-console.log("🔥 Content script - Job Application Filler starting...");
-
 class JobApplicationFiller {
   constructor() {
-    console.log("🔧 JobApplicationFiller constructor called");
     this.isEnabled = true;
     this.currentField = null;
     this.suggestionPopup = null;
     this.fieldObserver = null;
+    this.debounceTimer = null;
 
     this.init();
   }
 
   async init() {
-    console.log(
-      "⚡ JobApplicationFiller init() called, document state:",
-      document.readyState
-    );
     // Wait for DOM to be fully loaded
     if (document.readyState === "loading") {
-      console.log("📋 Document still loading, waiting for DOMContentLoaded...");
       document.addEventListener("DOMContentLoaded", () =>
         this.setupExtension()
       );
     } else {
-      console.log("📋 Document ready, calling setupExtension immediately");
       this.setupExtension();
     }
   }
 
   async setupExtension() {
     try {
-      console.log("🚀 Setting up Job Application Filler...");
-
       // Check if chrome.runtime is available
       if (typeof chrome === "undefined" || !chrome.runtime) {
-        console.warn(
-          "⚠️ Chrome extension APIs not available - running in limited mode"
-        );
         // Still set up basic functionality without Chrome APIs
         this.injectCSS();
         this.setupFieldMonitoring();
@@ -46,17 +33,12 @@ class JobApplicationFiller {
 
       // Inject CSS for suggestions popup
       this.injectCSS();
-      console.log("✅ CSS injected");
 
       // Get user preferences with defaults
       const response = await this.sendMessage({ action: "getUserData" });
-      console.log("📊 User data response:", response);
 
       // Handle extension context invalidation
       if (response.contextInvalidated) {
-        console.warn(
-          "⚠️ Extension context invalidated during setup, running in offline mode"
-        );
         this.showGlobalContextInvalidatedMessage();
         this.isEnabled = true;
         this.showSuggestions = false; // Disable suggestions since we can't communicate with background
@@ -77,26 +59,17 @@ class JobApplicationFiller {
         this.saveNewData = true;
       }
 
-      console.log("⚙️ Settings:", {
-        enabled: this.isEnabled,
-        showSuggestions: this.showSuggestions,
-        saveNewData: this.saveNewData,
-      });
-
       if (!this.isEnabled) {
-        console.log("⏸️ Auto-fill is disabled, stopping setup");
         return;
       }
 
       // Set up field monitoring
       this.setupFieldMonitoring();
-      console.log("👁️ Field monitoring setup complete");
 
       // Auto-fill known fields
       this.autoFillKnownFields();
-      console.log("🔧 Auto-fill setup complete");
     } catch (error) {
-      console.error("❌ Error setting up extension:", error);
+      console.error("Error setting up extension:", error);
       // Continue with basic functionality even if setup fails
       this.isEnabled = true;
       this.showSuggestions = true;
@@ -256,37 +229,17 @@ class JobApplicationFiller {
     if (field.hasAttribute("data-job-filler-processed")) return;
     field.setAttribute("data-job-filler-processed", "true");
 
-    console.log("🎯 Setting up listener for field:", {
-      name: field.name,
-      id: field.id,
-      type: field.type,
-      tag: field.tagName,
-    });
-
     // Focus event - show suggestions
     field.addEventListener("focus", (e) => {
       try {
-        console.log(
-          "🔍 Field focused - showing suggestions:",
-          e.target.id || e.target.name || "unnamed"
-        );
-        console.log("🧭 Current settings:", {
-          isEnabled: this.isEnabled,
-          showSuggestions: this.showSuggestions,
-          saveNewData: this.saveNewData,
-        });
-
         this.currentField = e.target;
         if (this.showSuggestions) {
-          console.log("📞 Calling showFieldSuggestions...");
           this.showFieldSuggestions(e.target).catch((error) => {
-            console.error("❌ Error in showFieldSuggestions:", error);
+            console.error("Error in showFieldSuggestions:", error);
           });
-        } else {
-          console.log("⚠️ Suggestions disabled in settings");
         }
       } catch (error) {
-        console.error("❌ Error in focus event handler:", error);
+        console.error("Error in focus event handler:", error);
       }
     });
 
@@ -299,7 +252,7 @@ class JobApplicationFiller {
           }, 1000);
         }
       } catch (error) {
-        console.error("❌ Error in input event handler:", error);
+        console.error("Error in input event handler:", error);
       }
     });
 
@@ -311,7 +264,7 @@ class JobApplicationFiller {
           this.hideSuggestions();
         }, 200);
       } catch (error) {
-        console.error("❌ Error in blur event handler:", error);
+        console.error("Error in blur event handler:", error);
       }
     });
   }
@@ -320,9 +273,6 @@ class JobApplicationFiller {
   showContextInvalidatedMessage(field) {
     // Safety check for field parameter
     if (!field || typeof field !== "object") {
-      console.warn(
-        "⚠️ Invalid field parameter passed to showContextInvalidatedMessage, using global message instead"
-      );
       this.showGlobalContextInvalidatedMessage();
       return;
     }
@@ -435,8 +385,6 @@ class JobApplicationFiller {
         }
       }
     }, 10000);
-
-    console.log("⚠️ Context invalidated message displayed");
   }
 
   async autoFillKnownFields() {
@@ -461,45 +409,19 @@ class JobApplicationFiller {
     try {
       // Safety check for field parameter
       if (!field || typeof field !== "object") {
-        console.warn(
-          "⚠️ Invalid field parameter passed to showFieldSuggestions:",
-          field
-        );
         return;
       }
 
-      console.log("🔍 Showing suggestions for field:", {
-        name: field.name,
-        id: field.id,
-        type: field.type,
-        placeholder: field.placeholder,
-      });
-
       const fieldInfo = this.getFieldInfo(field);
-      console.log("📋 Field info generated:", fieldInfo);
-
       const response = await this.sendMessage({
         action: "getSuggestions",
         fieldInfo,
       });
 
-      console.log("📝 Suggestions response:", response);
-
       // Handle extension context invalidation
       if (response.contextInvalidated) {
-        console.warn(
-          "⚠️ Extension context invalidated, showing fallback message"
-        );
         this.showContextInvalidatedMessage(field);
         return;
-      }
-
-      // Debug: Also check if we have user data (only if first call succeeded)
-      if (response.success) {
-        const userDataResponse = await this.sendMessage({
-          action: "getUserData",
-        });
-        console.log("🔍 Debug - User data check:", userDataResponse);
       }
 
       if (
@@ -508,37 +430,9 @@ class JobApplicationFiller {
         response.suggestions.length > 0
       ) {
         this.createSuggestionPopup(field, response.suggestions);
-        console.log(
-          "✅ Created suggestion popup with",
-          response.suggestions.length,
-          "suggestions"
-        );
-      } else {
-        console.log(
-          "⚠️ No suggestions available for this field. Response:",
-          response
-        );
-
-        // For testing, let's create a dummy suggestion
-        const dummySuggestions = [
-          { label: "Test First Name", value: "John" },
-          { label: "Test Email", value: "john.doe@example.com" },
-        ];
-        console.log(
-          "🧪 Creating dummy suggestions for testing:",
-          dummySuggestions
-        );
-        this.createSuggestionPopup(field, dummySuggestions);
       }
     } catch (error) {
-      console.error("❌ Error in showFieldSuggestions:", error);
-
-      // Show error suggestions for debugging
-      const errorSuggestions = [
-        { label: "Error occurred", value: error.message },
-        { label: "Debug Test", value: "Debug Value" },
-      ];
-      this.createSuggestionPopup(field, errorSuggestions);
+      console.error("Error in showFieldSuggestions:", error);
     }
   }
 
@@ -604,28 +498,13 @@ class JobApplicationFiller {
   createSuggestionPopup(field, suggestions) {
     // Safety check for field parameter
     if (!field || typeof field !== "object") {
-      console.warn(
-        "⚠️ Invalid field parameter passed to createSuggestionPopup:",
-        field
-      );
       return;
     }
 
     // Safety check for suggestions parameter
     if (!Array.isArray(suggestions) || suggestions.length === 0) {
-      console.warn(
-        "⚠️ Invalid or empty suggestions passed to createSuggestionPopup:",
-        suggestions
-      );
       return;
     }
-
-    console.log(
-      "🎨 Creating suggestion popup for field:",
-      field.id || field.name,
-      "with suggestions:",
-      suggestions
-    );
 
     // Remove existing popup
     this.hideSuggestions();
@@ -677,7 +556,7 @@ class JobApplicationFiller {
         <div style="padding: 8px 0 !important;">
           ${suggestions
             .map(
-              (suggestion, index) => `
+              (suggestion) => `
             <div class="suggestion-item" data-value="${(suggestion.value || "")
               .toString()
               .replace(/"/g, "&quot;")}" data-field="${
@@ -709,7 +588,7 @@ class JobApplicationFiller {
         </div>
       `;
     } catch (error) {
-      console.error("❌ Error creating popup HTML:", error);
+      console.error("Error creating popup HTML:", error);
       popup.innerHTML = `
         <div style="padding: 16px; color: #dc2626; font-size: 14px;">
           Error creating suggestions popup
@@ -717,7 +596,7 @@ class JobApplicationFiller {
       `;
     }
 
-    // Add event listeners instead of inline handlers
+    // Add event listeners
     const closeBtn = popup.querySelector(".suggestion-close-btn");
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
@@ -734,7 +613,7 @@ class JobApplicationFiller {
       });
     });
 
-    // Position popup near the field - LEFT side positioning
+    // Position popup near the field
     if (field && typeof field.getBoundingClientRect === "function") {
       const rect = field.getBoundingClientRect();
       const popupWidth = 300;
@@ -771,16 +650,6 @@ class JobApplicationFiller {
       popup.style.setProperty("visibility", "visible", "important");
       popup.style.setProperty("opacity", "1", "important");
     }, 10);
-
-    console.log("✅ Suggestion popup created and positioned");
-    console.log("🔍 Popup element:", popup);
-    console.log("🔍 Popup computed styles:", {
-      position: getComputedStyle(popup).position,
-      zIndex: getComputedStyle(popup).zIndex,
-      display: getComputedStyle(popup).display,
-      visibility: getComputedStyle(popup).visibility,
-      opacity: getComputedStyle(popup).opacity,
-    });
   }
 
   fillField(field, value) {
@@ -850,60 +719,6 @@ class JobApplicationFiller {
     const str = text.toString();
     if (str.length <= maxLength) return str;
     return str.substring(0, maxLength) + "...";
-  }
-
-  // Direct test function for debugging
-  async testSuggestionPopup(field) {
-    console.log("🧪 Testing suggestion popup directly...");
-
-    // Create test suggestions
-    const testSuggestions = [
-      { label: "Test First Name", value: "John" },
-      { label: "Test Last Name", value: "Doe" },
-      { label: "Test Email", value: "john.doe@example.com" },
-    ];
-
-    this.createSuggestionPopup(field, testSuggestions);
-    console.log("✅ Test popup created with test suggestions");
-  }
-
-  // Brave-specific test popup
-  testBravePopup(field) {
-    console.log("🦁 Testing Brave-compatible popup...");
-
-    // Remove any existing popup
-    const existing = document.querySelector(".brave-test-popup");
-    if (existing) existing.remove();
-
-    // Create a very simple popup that should work in any browser
-    const popup = document.createElement("div");
-    popup.className = "brave-test-popup";
-    popup.innerHTML = "BRAVE TEST POPUP - WORKING!";
-
-    // Use the most basic styling possible
-    popup.style.position = "fixed";
-    popup.style.top = "50px";
-    popup.style.left = "50px";
-    popup.style.width = "200px";
-    popup.style.height = "100px";
-    popup.style.backgroundColor = "red";
-    popup.style.color = "white";
-    popup.style.zIndex = "999999";
-    popup.style.padding = "20px";
-    popup.style.border = "3px solid black";
-    popup.style.fontSize = "14px";
-    popup.style.fontWeight = "bold";
-
-    document.body.appendChild(popup);
-
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-      if (popup.parentNode) {
-        popup.parentNode.removeChild(popup);
-      }
-    }, 5000);
-
-    console.log("🦁 Brave test popup created");
   }
 
   debounce(func, delay) {
@@ -997,9 +812,6 @@ class JobApplicationFiller {
       try {
         // Check if chrome runtime is available
         if (!chrome || !chrome.runtime) {
-          console.warn(
-            "⚠️ Chrome runtime not available - extension may have been reloaded"
-          );
           this.showGlobalContextInvalidatedMessage();
           resolve({ success: false, error: "Chrome runtime not available" });
           return;
@@ -1007,9 +819,6 @@ class JobApplicationFiller {
 
         // Check if extension context is still valid
         if (!chrome.runtime.id) {
-          console.warn(
-            "⚠️ Extension context invalidated - extension was reloaded"
-          );
           this.showGlobalContextInvalidatedMessage();
           resolve({ success: false, error: "Extension context invalidated" });
           return;
@@ -1025,10 +834,6 @@ class JobApplicationFiller {
               errorMessage.includes("message port closed") ||
               errorMessage.includes("receiving end does not exist")
             ) {
-              console.warn("⚠️ Extension context lost:", errorMessage);
-              console.info(
-                "💡 Please reload the page to restore extension functionality"
-              );
               this.showGlobalContextInvalidatedMessage();
               resolve({
                 success: false,
@@ -1036,7 +841,7 @@ class JobApplicationFiller {
                 contextInvalidated: true,
               });
             } else {
-              console.error("❌ Chrome runtime error:", errorMessage);
+              console.error("Chrome runtime error:", errorMessage);
               resolve({
                 success: false,
                 error: errorMessage,
@@ -1049,7 +854,7 @@ class JobApplicationFiller {
           }
         });
       } catch (error) {
-        console.error("❌ Error sending message:", error);
+        console.error("Error sending message:", error);
         resolve({ success: false, error: error.message });
       }
     });
@@ -1064,66 +869,9 @@ class JobApplicationFiller {
 }
 
 // Initialize the content script
-console.log("🔧 Content script file loaded - URL:", window.location.href);
-console.log("🌐 Browser info:", {
-  userAgent: navigator.userAgent,
-  isBrave: navigator.brave ? "detected" : "not detected",
-  isChrome: !!window.chrome,
-  vendor: navigator.vendor,
-  chromeRuntimeAvailable: typeof chrome !== "undefined" && !!chrome.runtime,
-});
-
 const jobApplicationFiller = new JobApplicationFiller();
-console.log("🚀 JobApplicationFiller instance created");
-
-// Make it globally accessible for debugging
-window.jobApplicationFiller = jobApplicationFiller;
-
-// Add global method for popup interactions
-window.jobApplicationFiller.fillFieldAndClose = function (
-  fieldIdentifier,
-  value,
-  element
-) {
-  const field =
-    document.getElementById(fieldIdentifier) ||
-    document.querySelector(`[name="${fieldIdentifier}"]`);
-  if (field) {
-    jobApplicationFiller.fillField(field, value);
-    jobApplicationFiller.hideSuggestions();
-    console.log("✅ Field filled:", fieldIdentifier, "with:", value);
-  }
-};
-
-// Add a global test function for debugging - make it available immediately
-window.testAutofill = () => {
-  console.log("🧪 Manual autofill test triggered");
-  console.log("📊 Current state:", {
-    isEnabled: jobApplicationFiller.isEnabled,
-    showSuggestions: jobApplicationFiller.showSuggestions,
-    currentField: jobApplicationFiller.currentField,
-  });
-
-  // Test message sending
-  jobApplicationFiller
-    .sendMessage({ action: "getUserData" })
-    .then((response) => {
-      console.log("📨 Test message response:", response);
-    })
-    .catch((error) => {
-      console.error("❌ Test message error:", error);
-    });
-};
-
-console.log(
-  "✅ Content script ready - Extension loaded and testAutofill() available"
-);
 
 // Clean up when page is unloaded
 window.addEventListener("beforeunload", () => {
   jobApplicationFiller.destroy();
 });
-
-console.log(
-  "✅ Content script initialization complete - type testAutofill() in console to debug"
-);

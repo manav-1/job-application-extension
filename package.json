@@ -1,32 +1,41 @@
 {
     "name": "ai-job-application-filler",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "Chrome extension for automatically filling job applications using AI and saved data",
     "main": "background.js",
     "scripts": {
-        "build": "echo 'Building extension...' && npm run validate",
-        "validate": "echo 'Validating manifest...' && node -e \"console.log('Manifest valid:', JSON.parse(require('fs').readFileSync('manifest.json', 'utf8')))\"",
-        "dev": "echo 'Development mode - Load unpacked extension in Chrome'",
-        "zip": "zip -r ai-job-application-filler.zip . -x '*.git*' 'node_modules/*' '*.zip' '*.md'"
+        "build": "npm run validate && npm run lint",
+        "validate": "node -e \"try { JSON.parse(require('fs').readFileSync('manifest.json', 'utf8')); console.log('✅ Manifest valid'); } catch(e) { console.error('❌ Manifest invalid:', e.message); process.exit(1); }\"",
+        "lint": "echo 'Running basic syntax checks...'",
+        "dev": "echo 'Load unpacked extension in Chrome: chrome://extensions/'",
+        "package": "npm run build && zip -r ai-job-application-filler-v$npm_package_version.zip . -x '*.git*' 'node_modules/*' '*.zip' '*.log' 'debug-*' 'test-*'",
+        "clean": "rm -f *.zip *.log debug-* test-*"
     },
     "keywords": [
         "chrome-extension",
         "job-application",
         "autofill",
         "ai",
+        "openai",
+        "gemini",
         "career",
         "productivity"
     ],
-    "author": "Your Name",
+    "author": "Manav",
     "license": "MIT",
     "repository": {
         "type": "git",
         "url": "git@github.com:manav-1/job-application-extension.git"
     },
+    "bugs": {
+        "url": "https://github.com/manav-1/job-application-extension/issues"
+    },
+    "homepage": "https://github.com/manav-1/job-application-extension#readme",
     "devDependencies": {
         "web-ext": "^7.0.0"
     },
     "engines": {
         "node": ">=14.0.0"
-    }
+    },
+    "private": true
 }

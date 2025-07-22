@@ -42,7 +42,8 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "suggestion-popup.html"
+                "styles/*.css",
+                "icons/*.png"
             ],
             "matches": [
                 "<all_urls>"
